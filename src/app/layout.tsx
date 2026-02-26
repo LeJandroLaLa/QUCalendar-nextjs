@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -100,8 +101,9 @@ export default function RootLayout({
         </header>
 
         <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem" }}>
-          {/* AuthProvider will wrap children in Phase 2 */}
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </main>
       </body>
     </html>
