@@ -43,17 +43,20 @@ export default function Header() {
       zIndex: 100,
     }}>
       <div style={{
+        background: 'rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(5px)',
+        height: '50px',
         display: 'flex',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '1rem 2rem 0.5rem',
-        maxWidth: '1200px',
-        margin: '0 auto',
+        justifyContent: 'space-between',
+        padding: '0 2rem',
       }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
           <h1 className="pride-gradient-text" style={{
-            fontSize: '1.8rem',
-            letterSpacing: '0.15em',
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
             fontFamily: "'Orbitron', sans-serif",
             margin: 0,
           }}>
