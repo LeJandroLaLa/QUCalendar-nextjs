@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { QUEvent, EVENT_CATEGORIES } from '@/lib/types'
+import { QUEvent, Venue, EVENT_CATEGORIES, VENUE_TYPES, VenueType } from '@/lib/types'
 import Link from 'next/link'
 
 const categoryNames = Object.keys(EVENT_CATEGORIES)
@@ -96,24 +96,34 @@ export default function HomePage() {
   const [dateFilter, setDateFilter] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [showCategoryGrid, setShowCategoryGrid] = useState(true)
+  const [selectedVenueTypes, setSelectedVenueTypes] = useState<VenueType[]>([])
+  const [showVenueTypeGrid, setShowVenueTypeGrid] = useState(true)
+  const [venueTypeMap, setVenueTypeMap] = useState<Map<string, VenueType>>(new Map())
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchAll = async () => {
       setLoading(true)
       try {
-        const q = query(collection(db, 'events'), where('status', '==', 'approved'))
-        const snapshot = await getDocs(q)
-        const fetched: QUEvent[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
-        // Only future + today
+        const [eventsSnap, venuesSnap] = await Promise.all([
+          getDocs(query(collection(db, 'events'), where('status', '==', 'approved'))),
+          getDocs(query(collection(db, 'venues'), where('status', '==', 'approved'))),
+        ])
+        const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
         const today = formatDateMDY(new Date())
         setEvents(fetched.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)))
+        const map = new Map<string, VenueType>()
+        venuesSnap.docs.forEach(doc => {
+          const v = { id: doc.id, ...doc.data() } as Venue
+          if (v.type) map.set(v.id, v.type)
+        })
+        setVenueTypeMap(map)
       } catch (err) {
-        console.error('Error fetching events:', err)
+        console.error('Error fetching data:', err)
       } finally {
         setLoading(false)
       }
     }
-    fetchEvents()
+    fetchAll()
   }, [])
 
   const setToday = () => setDateFilter(formatDateMDY(new Date()))
@@ -125,11 +135,18 @@ export default function HomePage() {
     setKeyword('')
     setDateFilter('')
     setSelectedCategories([])
+    setSelectedVenueTypes([])
   }
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories(prev =>
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    )
+  }
+
+  const toggleVenueType = (vt: VenueType) => {
+    setSelectedVenueTypes(prev =>
+      prev.includes(vt) ? prev.filter(t => t !== vt) : [...prev, vt]
     )
   }
 
@@ -164,8 +181,16 @@ export default function HomePage() {
       evts = evts.filter(e => selectedCategories.includes(e.category))
     }
 
+    if (selectedVenueTypes.length > 0) {
+      evts = evts.filter(e => {
+        if (!e.venueId) return false
+        const vt = venueTypeMap.get(e.venueId)
+        return vt !== undefined && selectedVenueTypes.includes(vt)
+      })
+    }
+
     return evts
-  }, [events, locationQuery, keyword, dateFilter, selectedCategories])
+  }, [events, locationQuery, keyword, dateFilter, selectedCategories, selectedVenueTypes, venueTypeMap])
 
   const dayGroups = useMemo(() => groupByDay(filteredEvents), [filteredEvents])
 
@@ -222,7 +247,7 @@ export default function HomePage() {
             style={{ ...inputStyle, flex: 2, minWidth: '150px' }} />
         </div>
 
-        {/* Category toggle */}
+        {/* Event Type sub-section */}
         <button onClick={() => setShowCategoryGrid(v => !v)} style={{
           background: 'none', border: 'none', color: 'var(--text-secondary)',
           cursor: 'pointer', fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
@@ -253,6 +278,42 @@ export default function HomePage() {
               }}>
                 <span style={{ fontSize: '1.3rem' }}>{EVENT_CATEGORIES[cat]}</span>
                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.2rem', lineHeight: 1.2 }}>{cat}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Venue Type sub-section */}
+        <button onClick={() => setShowVenueTypeGrid(v => !v)} style={{
+          background: 'none', border: 'none', color: 'var(--text-secondary)',
+          cursor: 'pointer', fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
+          padding: '0.25rem 0', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
+        }}>
+          {showVenueTypeGrid ? '▼' : '▶'} Filter by Venue Type
+          {selectedVenueTypes.length > 0 && (
+            <span style={{ color: 'var(--pride-yellow)', fontSize: '0.75rem' }}>
+              ({selectedVenueTypes.length} active)
+            </span>
+          )}
+        </button>
+
+        {showVenueTypeGrid && (
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
+            gap: '0.5rem', marginTop: '0.75rem',
+          }}>
+            {(Object.keys(VENUE_TYPES) as VenueType[]).map(vt => (
+              <div key={vt} onClick={() => toggleVenueType(vt)} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: '0.5rem 0.25rem', borderRadius: '8px', cursor: 'pointer',
+                background: selectedVenueTypes.includes(vt)
+                  ? 'rgba(117,7,135,0.4)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${selectedVenueTypes.includes(vt) ? 'rgba(117,7,135,0.8)' : 'var(--border-glass)'}`,
+                transition: 'all 0.15s',
+                userSelect: 'none',
+              }}>
+                <span style={{ fontSize: '1.3rem' }}>{VENUE_TYPES[vt]}</span>
+                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.2rem', lineHeight: 1.2 }}>{vt}</span>
               </div>
             ))}
           </div>
