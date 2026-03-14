@@ -204,9 +204,9 @@ export default function HomePage() {
     <div>
       {/* Hero */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}
-            className="pride-gradient-text">
-          QU Calendar — Your Non-Profit LGBTQ+ Event Hub
+        <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}>
+          QU Calendar — Your Non-Profit <span style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}
+            className="pride-gradient-text">LGBTQ+</span> Event Hub
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
           A unified hub for discovering gatherings put on by and for our communities across Cincinnati, Northern Kentucky... and beyond.
@@ -216,6 +216,9 @@ export default function HomePage() {
       {/* Filter bar */}
       <div className="glass-card" style={{ padding: '1rem', marginBottom: '1rem' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <input type="text" placeholder="Search all events..." value={keyword}
+            onChange={e => setKeyword(e.target.value)}
+            style={{ ...inputStyle, flex: 2, minWidth: '150px' }} />
           <div style={{ position: 'relative', flex: 1, minWidth: '150px' }}>
             <span style={{ position: 'absolute', left: '0.6rem', top: '50%', transform: 'translateY(-50%)' }}>📍</span>
             <input type="text" placeholder="Location" value={locationQuery}
@@ -242,9 +245,6 @@ export default function HomePage() {
             ...inputStyle, cursor: 'pointer', background: 'rgba(255,255,255,0.05)',
             border: '1px solid var(--border-glass)',
           }}>Clear</button>
-          <input type="text" placeholder="Search events..." value={keyword}
-            onChange={e => setKeyword(e.target.value)}
-            style={{ ...inputStyle, flex: 2, minWidth: '150px' }} />
         </div>
 
         {/* Event Type sub-section */}
