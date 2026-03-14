@@ -25,7 +25,7 @@ export default function AdminVenuesPage() {
     const fetchPending = async () => {
       try {
         const snap = await getDocs(
-          query(collection(db, 'venues'), where('status', '==', 'pending'))
+          query(collection(db, 'venues'), where('status', '==', 'pending')) // TODO: migrate Firestore collection from 'venues' to 'spaces'
         )
         setVenues(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as PendingVenue))
       } catch (err) {
@@ -41,12 +41,12 @@ export default function AdminVenuesPage() {
     // Optimistic UI update
     setVenues((prev) => prev.filter((v) => v.id !== id))
     try {
-      await updateDoc(doc(db, 'venues', id), { status })
+      await updateDoc(doc(db, 'venues', id), { status }) // TODO: migrate Firestore collection from 'venues' to 'spaces'
     } catch (err) {
       console.error(`Error setting venue to ${status}:`, err)
       // Refetch on error
       const snap = await getDocs(
-        query(collection(db, 'venues'), where('status', '==', 'pending'))
+        query(collection(db, 'venues'), where('status', '==', 'pending')) // TODO: migrate Firestore collection from 'venues' to 'spaces'
       )
       setVenues(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as PendingVenue))
     }
