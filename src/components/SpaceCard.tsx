@@ -1,21 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { Venue } from '@/lib/types'
+import { Space } from '@/lib/types'
 
-export default function VenueCard({ venue }: { venue: Venue }) {
+export default function SpaceCard({ space }: { space: Space }) {
   return (
-    <Link href={`/venues/${venue.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link href={`/spaces/${space.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       <div className="glass-card" style={{
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'transform 0.2s, border-color 0.2s',
       }}>
-        {venue.imageUrl ? (
+        {space.imageUrl ? (
           <div style={{
             width: '100%',
             height: '160px',
-            backgroundImage: `url(${venue.imageUrl})`,
+            backgroundImage: `url(${space.imageUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }} />
@@ -39,23 +39,23 @@ export default function VenueCard({ venue }: { venue: Venue }) {
             color: 'var(--text-primary)',
             marginBottom: '0.5rem',
           }}>
-            {venue.name}
+            {space.name}
           </h3>
-          {venue.type && (
+          {space.type && (
             <p style={{
               fontSize: '0.8rem',
               color: 'var(--pride-violet)',
               marginBottom: '0.25rem',
             }}>
-              {venue.type}
+              {space.type}
             </p>
           )}
-          {venue.address && (
+          {space.address && (
             <p style={{
               fontSize: '0.8rem',
               color: 'var(--text-secondary)',
             }}>
-              {venue.address}
+              {space.address}
             </p>
           )}
         </div>

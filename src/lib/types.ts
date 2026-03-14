@@ -18,10 +18,10 @@ export interface QUEvent {
   status: string
 }
 
-export interface Venue {
+export interface Space {
   id: string
   name: string
-  type?: VenueType
+  type?: SpaceType
   address?: string
   description?: string
   imageUrl?: string
@@ -45,7 +45,7 @@ export interface Artist {
   status?: string
 }
 
-export type VenueType =
+export type SpaceType =
   | 'Restaurant'
   | 'Theatre'
   | 'Events Space'
@@ -56,7 +56,7 @@ export type VenueType =
   | 'Gallery / Museum'
   | 'Private Venue'
 
-export const VENUE_TYPES: Record<VenueType, string> = {
+export const SPACE_TYPES: Record<SpaceType, string> = {
   'Restaurant': '🍽️',
   'Theatre': '🎭',
   'Events Space': '🎪',

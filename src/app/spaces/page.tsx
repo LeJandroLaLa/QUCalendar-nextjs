@@ -3,19 +3,19 @@
 import { useEffect, useState, useMemo } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { Venue, VENUE_TYPES, VenueType } from '@/lib/types'
-import VenueCard from '@/components/VenueCard'
+import { Space, SPACE_TYPES, SpaceType } from '@/lib/types'
+import SpaceCard from '@/components/SpaceCard'
 
-const venueTypeNames = Object.keys(VENUE_TYPES) as VenueType[]
+const spaceTypeNames = Object.keys(SPACE_TYPES) as SpaceType[]
 
-export default function VenuesPage() {
-  const [venues, setVenues] = useState<Venue[]>([])
+export default function SpacesPage() {
+  const [spaces, setSpaces] = useState<Space[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedTypes, setSelectedTypes] = useState<VenueType[]>([])
+  const [selectedTypes, setSelectedTypes] = useState<SpaceType[]>([])
   const [showTypeGrid, setShowTypeGrid] = useState(true)
 
   useEffect(() => {
-    const fetchVenues = async () => {
+    const fetchSpaces = async () => {
       try {
         const q = query(
           collection(db, 'venues'), // TODO: migrate Firestore collection from 'venues' to 'spaces'
@@ -25,27 +25,27 @@ export default function VenuesPage() {
         const fetched = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })) as Venue[]
-        setVenues(fetched)
+        })) as Space[]
+        setSpaces(fetched)
       } catch (err) {
-        console.error('Error fetching venues:', err)
+        console.error('Error fetching spaces:', err)
       } finally {
         setLoading(false)
       }
     }
-    fetchVenues()
+    fetchSpaces()
   }, [])
 
-  const toggleType = (vt: VenueType) => {
+  const toggleType = (vt: SpaceType) => {
     setSelectedTypes(prev =>
       prev.includes(vt) ? prev.filter(t => t !== vt) : [...prev, vt]
     )
   }
 
   const filtered = useMemo(() => {
-    if (selectedTypes.length === 0) return venues
-    return venues.filter((v) => v.type && selectedTypes.includes(v.type))
-  }, [venues, selectedTypes])
+    if (selectedTypes.length === 0) return spaces
+    return spaces.filter((s) => s.type && selectedTypes.includes(s.type))
+  }, [spaces, selectedTypes])
 
   return (
     <div>
@@ -54,17 +54,17 @@ export default function VenuesPage() {
         fontSize: '1.3rem',
         marginBottom: '1.5rem',
       }} className="pride-gradient-text">
-        Venues
+        Spaces
       </h2>
 
-      {/* Venue type filter grid */}
+      {/* Space type filter grid */}
       <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
         <button onClick={() => setShowTypeGrid(v => !v)} style={{
           background: 'none', border: 'none', color: 'var(--text-secondary)',
           cursor: 'pointer', fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
           padding: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem',
         }}>
-          {showTypeGrid ? '▼' : '▶'} Filter by Venue Type
+          {showTypeGrid ? '▼' : '▶'} Filter by Space Type
           {selectedTypes.length > 0 && (
             <span style={{ color: 'var(--pride-yellow)', fontSize: '0.75rem' }}>
               ({selectedTypes.length} active)
@@ -77,7 +77,7 @@ export default function VenuesPage() {
             display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
             gap: '0.5rem', marginTop: '0.75rem',
           }}>
-            {venueTypeNames.map(vt => (
+            {spaceTypeNames.map(vt => (
               <div key={vt} onClick={() => toggleType(vt)} style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 padding: '0.5rem 0.25rem', borderRadius: '8px', cursor: 'pointer',
@@ -87,7 +87,7 @@ export default function VenuesPage() {
                 transition: 'all 0.15s',
                 userSelect: 'none',
               }}>
-                <span style={{ fontSize: '1.3rem' }}>{VENUE_TYPES[vt]}</span>
+                <span style={{ fontSize: '1.3rem' }}>{SPACE_TYPES[vt]}</span>
                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.2rem', lineHeight: 1.2 }}>{vt}</span>
               </div>
             ))}
@@ -97,7 +97,7 @@ export default function VenuesPage() {
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
-          Loading venues...
+          Loading spaces...
         </div>
       ) : filtered.length > 0 ? (
         <div style={{
@@ -105,14 +105,14 @@ export default function VenuesPage() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: '1rem',
         }}>
-          {filtered.map((venue) => (
-            <VenueCard key={venue.id} venue={venue} />
+          {filtered.map((space) => (
+            <SpaceCard key={space.id} space={space} />
           ))}
         </div>
       ) : (
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
           <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🏠</p>
-          <p>No venues found. Check back soon!</p>
+          <p>No spaces found. Check back soon!</p>
         </div>
       )}
     </div>

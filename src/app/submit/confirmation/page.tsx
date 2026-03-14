@@ -46,7 +46,7 @@ export default function ConfirmationPage() {
           }}>
             Calendar
           </Link>
-          <Link href="/venues" style={{
+          <Link href="/spaces" style={{
             padding: '0.6rem 1.5rem',
             borderRadius: '8px',
             border: '1px solid var(--border-glass)',
@@ -56,7 +56,7 @@ export default function ConfirmationPage() {
             fontWeight: 600,
             fontSize: '0.9rem',
           }}>
-            Venues
+            Spaces
           </Link>
           <Link href="/artists" style={{
             padding: '0.6rem 1.5rem',

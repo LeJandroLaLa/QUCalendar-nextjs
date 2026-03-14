@@ -27,7 +27,7 @@ export default function Header() {
 
   const navLinks = [
     { label: 'Calendar', href: '/' },
-    { label: 'Venues', href: '/venues' },
+    { label: 'Spaces', href: '/spaces' },
     { label: 'Artists', href: '/artists' },
     ...(user ? [{ label: 'My Profiles', href: '/my-profiles' }] : []),
     { label: 'About', href: '/about' },

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
-import { EVENT_CATEGORIES, Venue, Artist } from '@/lib/types'
+import { EVENT_CATEGORIES, Space, Artist } from '@/lib/types'
 import ImageUpload from '@/components/ImageUpload'
 
 const categoryNames = Object.keys(EVENT_CATEGORIES)
@@ -15,9 +15,9 @@ export default function SubmitEventPage() {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [venues, setVenues] = useState<Venue[]>([])
+  const [spaces, setSpaces] = useState<Space[]>([])
   const [artists, setArtists] = useState<Artist[]>([])
-  const [venueMode, setVenueMode] = useState<'select' | 'manual'>('select')
+  const [spaceMode, setSpaceMode] = useState<'select' | 'manual'>('select')
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -34,15 +34,15 @@ export default function SubmitEventPage() {
     imageUrl: '',
   })
 
-  // Fetch approved venues and artists for dropdowns
+  // Fetch approved spaces and artists for dropdowns
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const [venueSnap, artistSnap] = await Promise.all([
+        const [spaceSnap, artistSnap] = await Promise.all([
           getDocs(query(collection(db, 'venues'), where('status', '==', 'approved'))), // TODO: migrate Firestore collection from 'venues' to 'spaces'
           getDocs(query(collection(db, 'artists'), where('status', '==', 'approved'))),
         ])
-        setVenues(venueSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as Venue))
+        setSpaces(spaceSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as Space))
         setArtists(artistSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as Artist))
       } catch (err) {
         console.error('Error fetching options:', err)
@@ -74,7 +74,7 @@ export default function SubmitEventPage() {
     setError('')
     setSubmitting(true)
     try {
-      const selectedVenue = venues.find((v) => v.id === form.venueId)
+      const selectedSpace = spaces.find((s) => s.id === form.venueId)
       const selectedArtist = artists.find((a) => a.id === form.artistId)
 
       await addDoc(collection(db, 'events'), {
@@ -86,8 +86,8 @@ export default function SubmitEventPage() {
         endDate: form.isMultiDay ? form.endDate : form.startDate,
         endTime: form.endTime,
         isMultiDay: form.isMultiDay,
-        venueId: venueMode === 'select' ? form.venueId : '',
-        venue: venueMode === 'select' ? (selectedVenue?.name || '') : form.venueManual.trim(),
+        venueId: spaceMode === 'select' ? form.venueId : '',
+        venue: spaceMode === 'select' ? (selectedSpace?.name || '') : form.venueManual.trim(),
         artistId: form.artistId,
         artist: selectedArtist?.name || '',
         ticketLink: form.ticketLink.trim(),
@@ -234,26 +234,26 @@ export default function SubmitEventPage() {
           </div>
         )}
 
-        {/* Venue */}
+        {/* Space */}
         <div>
-          <label style={labelStyle}>Venue</label>
+          <label style={labelStyle}>Space</label>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <button type="button" onClick={() => setVenueMode('select')} style={toggleBtnStyle(venueMode === 'select')}>
+            <button type="button" onClick={() => setSpaceMode('select')} style={toggleBtnStyle(spaceMode === 'select')}>
               Select Existing
             </button>
-            <button type="button" onClick={() => setVenueMode('manual')} style={toggleBtnStyle(venueMode === 'manual')}>
+            <button type="button" onClick={() => setSpaceMode('manual')} style={toggleBtnStyle(spaceMode === 'manual')}>
               Enter Manually
             </button>
           </div>
-          {venueMode === 'select' ? (
+          {spaceMode === 'select' ? (
             <select value={form.venueId} onChange={(e) => updateField('venueId', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-              <option value="">Select venue...</option>
-              {venues.map((v) => (
-                <option key={v.id} value={v.id}>{v.name}</option>
+              <option value="">Select space...</option>
+              {spaces.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
           ) : (
-            <input type="text" value={form.venueManual} onChange={(e) => updateField('venueManual', e.target.value)} placeholder="Venue name" style={inputStyle} />
+            <input type="text" value={form.venueManual} onChange={(e) => updateField('venueManual', e.target.value)} placeholder="Space name" style={inputStyle} />
           )}
         </div>
 

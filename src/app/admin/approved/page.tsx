@@ -5,7 +5,7 @@ import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/fire
 import { db } from '@/lib/firebase'
 import { EVENT_CATEGORIES } from '@/lib/types'
 
-type Tab = 'venues' | 'artists' | 'events'
+type Tab = 'spaces' | 'artists' | 'events'
 
 interface ApprovedItem {
   id: string
@@ -17,15 +17,16 @@ interface ApprovedItem {
 }
 
 export default function ApprovedContentPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('venues')
+  const [activeTab, setActiveTab] = useState<Tab>('spaces')
   const [items, setItems] = useState<ApprovedItem[]>([])
   const [loading, setLoading] = useState(true)
 
   const fetchItems = async (tab: Tab) => {
     setLoading(true)
     try {
+      const collectionName = tab === 'spaces' ? 'venues' : tab // TODO: migrate Firestore collection from 'venues' to 'spaces'
       const snap = await getDocs(
-        query(collection(db, tab), where('status', '==', 'approved'))
+        query(collection(db, collectionName), where('status', '==', 'approved'))
       )
       const nameField = tab === 'events' ? 'title' : 'name'
       setItems(
@@ -55,7 +56,8 @@ export default function ApprovedContentPage() {
   const handleUnpublish = async (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id))
     try {
-      await updateDoc(doc(db, activeTab, id), { status: 'archived' })
+      const collectionName = activeTab === 'spaces' ? 'venues' : activeTab // TODO: migrate Firestore collection from 'venues' to 'spaces'
+      await updateDoc(doc(db, collectionName, id), { status: 'archived' })
     } catch (err) {
       console.error('Error archiving item:', err)
       fetchItems(activeTab)
@@ -67,7 +69,7 @@ export default function ApprovedContentPage() {
   }
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'venues', label: 'Venues' },
+    { key: 'spaces', label: 'Spaces' },
     { key: 'artists', label: 'Artists' },
     { key: 'events', label: 'Events' },
   ]

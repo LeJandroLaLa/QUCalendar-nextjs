@@ -7,7 +7,7 @@ import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 import ImageUpload from '@/components/ImageUpload'
 
-const VENUE_TYPES = [
+const SPACE_TYPES = [
   'Bar', 'Club', 'Restaurant', 'Theater', 'Gallery',
   'Community Center', 'Outdoor Space', 'Other',
 ]
@@ -17,7 +17,7 @@ const AMENITIES = [
   'Parking', '21+', 'All Ages',
 ]
 
-export default function SubmitVenuePage() {
+export default function SubmitSpacePage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -80,7 +80,7 @@ export default function SubmitVenuePage() {
       })
       router.push('/submit/confirmation')
     } catch (err) {
-      console.error('Error submitting venue:', err)
+      console.error('Error submitting space:', err)
       setError('Failed to submit. Please try again.')
     } finally {
       setSubmitting(false)
@@ -113,7 +113,7 @@ export default function SubmitVenuePage() {
         fontSize: '1.3rem',
         marginBottom: '1.5rem',
       }} className="pride-gradient-text">
-        Submit a Venue
+        Submit a Space
       </h2>
 
       {error && (
@@ -142,7 +142,7 @@ export default function SubmitVenuePage() {
           <label style={labelStyle}>Type *</label>
           <select value={form.type} onChange={(e) => updateField('type', e.target.value)} required style={{ ...inputStyle, cursor: 'pointer' }}>
             <option value="">Select type...</option>
-            {VENUE_TYPES.map((t) => (
+            {SPACE_TYPES.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
           </select>
@@ -208,7 +208,7 @@ export default function SubmitVenuePage() {
 
         {/* Image */}
         <ImageUpload
-          storagePath={`venues/${user.uid}`}
+          storagePath={`spaces/${user.uid}`}
           onImageUrl={(url) => setForm((prev) => ({ ...prev, imageUrl: url }))}
         />
 
@@ -229,7 +229,7 @@ export default function SubmitVenuePage() {
             opacity: submitting ? 0.6 : 1,
           }}
         >
-          {submitting ? 'Submitting...' : 'Submit Venue'}
+          {submitting ? 'Submitting...' : 'Submit Space'}
         </button>
       </form>
     </div>
