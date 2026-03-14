@@ -19,7 +19,7 @@ export interface QUEvent {
 export interface Venue {
   id: string
   name: string
-  type?: string
+  type?: VenueType
   address?: string
   description?: string
   imageUrl?: string
@@ -39,6 +39,29 @@ export interface Artist {
   website?: string
   socialLinks?: Record<string, string>
   status?: string
+}
+
+export type VenueType =
+  | 'Restaurant'
+  | 'Theatre'
+  | 'Events Space'
+  | 'Bar'
+  | 'Night Club'
+  | 'Park / Public Space'
+  | 'Community Center'
+  | 'Gallery / Museum'
+  | 'Private Venue'
+
+export const VENUE_TYPES: Record<VenueType, string> = {
+  'Restaurant': '🍽️',
+  'Theatre': '🎭',
+  'Events Space': '🎪',
+  'Bar': '🍺',
+  'Night Club': '🌟',
+  'Park / Public Space': '🌳',
+  'Community Center': '🤝',
+  'Gallery / Museum': '🎨',
+  'Private Venue': '🏛️',
 }
 
 export const EVENT_CATEGORIES: Record<string, string> = {
