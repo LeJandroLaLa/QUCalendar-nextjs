@@ -16,7 +16,7 @@ export default function VenueDetail({ id }: { id: string }) {
   useEffect(() => {
     const fetchVenue = async () => {
       try {
-        const docRef = doc(db, 'venues', id)
+        const docRef = doc(db, 'venues', id) // TODO: migrate Firestore collection from 'venues' to 'spaces'
         const snap = await getDoc(docRef)
         if (snap.exists()) {
           setVenue({ id: snap.id, ...snap.data() } as Venue)

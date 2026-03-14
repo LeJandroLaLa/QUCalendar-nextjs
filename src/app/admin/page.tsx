@@ -22,7 +22,7 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         const [pv, pa, pe] = await Promise.all([
-          getDocs(query(collection(db, 'venues'), where('status', '==', 'pending'))),
+          getDocs(query(collection(db, 'venues'), where('status', '==', 'pending'))), // TODO: migrate Firestore collection from 'venues' to 'spaces'
           getDocs(query(collection(db, 'artists'), where('status', '==', 'pending'))),
           getDocs(query(collection(db, 'events'), where('status', '==', 'pending'))),
         ])
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
         // Fetch recent submissions across all collections
         const recentItems: RecentItem[] = []
         const collections = [
-          { name: 'venues', type: 'venue' as const, field: 'name' },
+          { name: 'venues', type: 'venue' as const, field: 'name' }, // TODO: migrate Firestore collection from 'venues' to 'spaces'
           { name: 'artists', type: 'artist' as const, field: 'name' },
           { name: 'events', type: 'event' as const, field: 'title' },
         ]

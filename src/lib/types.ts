@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore'
+
 export interface QUEvent {
   id: string
   title: string
@@ -27,6 +29,8 @@ export interface Venue {
   phone?: string
   amenities?: string[]
   status?: string
+  braveSpace: boolean
+  ownerUid: string
 }
 
 export interface Artist {
@@ -63,6 +67,27 @@ export const VENUE_TYPES: Record<VenueType, string> = {
   'Gallery / Museum': '🎨',
   'Private Venue': '🏛️',
 }
+
+export interface VaultEntry {
+  id: string
+  title: string
+  year: number
+  primaryEra: '60s' | '70s' | '80s' | '90s' | '00s' | '10s' | '20s' | 'present'
+  body: string
+  mediaType: 'photo' | 'video' | 'mixed'
+  mediaUrls: Array<{ url: string; metadata: { width: number; height: number } }>
+  videoEmbeds: string[]
+  photographerCredit: string
+  photographerId?: string
+  isArchival: boolean
+  contributorUid: string
+  visibility: 'public' | 'private'
+  tags: string[]
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+export const VAULT_ENTRIES_PATH = 'spaces/{spaceId}/vault_entries/{entryId}'
 
 export const EVENT_CATEGORIES: Record<string, string> = {
   'Drag Show': '🎭',
