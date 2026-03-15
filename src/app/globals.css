@@ -1,18 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
 
 :root {
-  --pride-red: #E40303;
-  --pride-orange: #FF8C00;
-  --pride-yellow: #FFED00;
-  --pride-green: #008026;
-  --pride-blue: #24408E;
-  --pride-violet: #732982;
+  --pride-red: #FF3B3B;
+  --pride-orange: #FF9F2E;
+  --pride-yellow: #FFE94D;
+  --pride-green: #00A832;
+  --pride-blue: #4D79FF;
+  --pride-violet: #9B3DB8;
   --bg-dark: #1a1a1a;
   --bg-card: rgba(255, 255, 255, 0.1);
   --border-glass: rgba(255, 255, 255, 0.2);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
-  --gradient-pride: linear-gradient(90deg, #E40303, #FF8C00, #FFED00, #008026, #24408E, #732982);
+  --gradient-pride: linear-gradient(90deg, #FF3B3B, #FF9F2E, #FFE94D, #00A832, #4D79FF, #9B3DB8);
   --accent: #00B4B4;
 }
 
