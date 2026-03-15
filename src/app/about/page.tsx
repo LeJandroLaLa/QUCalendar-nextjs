@@ -163,108 +163,94 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 3. For Creators & Organizers ── */}
+      {/* ── 3. How It Works ── */}
       <section style={{ padding: '0 2rem 4rem' }}>
         <div style={maxWidth}>
-          <div style={{ ...glassCard, padding: '2.5rem' }}>
-            <h2
-              style={{
-                fontFamily: "'Orbitron', sans-serif",
-                fontSize: 'clamp(1.3rem, 2.5vw, 1.8rem)',
-                fontWeight: 700,
-                marginBottom: '0.75rem',
-                color: 'var(--text-primary)',
-              }}
-            >
-              For Creators &amp; Organizers
-            </h2>
+          <h2
+            style={{
+              fontFamily: "'Orbitron', sans-serif",
+              fontSize: 'clamp(1.4rem, 3vw, 2rem)',
+              fontWeight: 700,
+              textAlign: 'center',
+              marginBottom: '2.5rem',
+              color: 'var(--text-primary)',
+            }}
+          >
+            How It Works
+          </h2>
 
-            <p
-              style={{
-                fontFamily: "'Exo 2', sans-serif",
-                fontSize: '1.1rem',
-                color: 'var(--accent)',
-                marginBottom: '1.25rem',
-                lineHeight: 1.5,
-              }}
-            >
-              You build the culture. We just make sure people find it.
-            </p>
-
-            <p
-              style={{
-                fontFamily: "'Exo 2', sans-serif",
-                fontSize: '0.98rem',
-                color: 'var(--text-secondary)',
-                lineHeight: 1.8,
-                marginBottom: '2rem',
-                maxWidth: '820px',
-              }}
-            >
-              Whether you&rsquo;re a drag performer, a visual artist, or a dive bar
-              owner, your work is a vital organ in the community&rsquo;s pulse. We
-              created QU to be your digital megaphone and your permanent archive.
-              By listing your space or event here, you aren&rsquo;t just filling a
-              calendar — you&rsquo;re claiming your place in the city&rsquo;s story.
-            </p>
-
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '1rem',
-              }}
-            >
-              <Link
-                href="/submit/event"
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.5rem',
+            }}
+          >
+            {[
+              {
+                num: '01',
+                title: 'Artists Are Invited',
+                body: 'Every artist on QU is here because someone in the community vouched for them. Artists are invited by verified members and approved by a separate artist — not the person who invited them. It keeps the community real.',
+              },
+              {
+                num: '02',
+                title: 'Spaces Join the Pulse',
+                body: 'Venues and spaces can claim their page and become a Brave Space — a verified, community-trusted home for queer events. Unverified spaces still appear when artists tag them, but with basic info only.',
+              },
+              {
+                num: '03',
+                title: 'Events Are Created by Community',
+                body: 'Only approved artists and verified spaces with accounts can submit events. Every submission is reviewed before it goes live on the calendar.',
+              },
+              {
+                num: '04',
+                title: 'The Archive Grows',
+                body: 'Every event, every space, every artist becomes part of the Heritage Vault — a living archive of queer community history that belongs to everyone.',
+              },
+            ].map((card) => (
+              <div
+                key={card.num}
                 style={{
-                  fontFamily: "'Exo 2', sans-serif",
-                  fontWeight: 600,
-                  fontSize: '0.95rem',
-                  padding: '0.7rem 1.75rem',
-                  borderRadius: '50px',
-                  textDecoration: 'none',
-                  color: '#ffffff',
-                  background: 'var(--pride-violet)',
-                  border: 'none',
-                  display: 'inline-block',
-                  transition: 'opacity 0.15s',
+                  ...glassCard,
+                  padding: '1.75rem',
                 }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.opacity = '0.85')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.opacity = '1')
-                }
               >
-                Submit Your Event
-              </Link>
-
-              <Link
-                href="/submit/space"
-                style={{
-                  fontFamily: "'Exo 2', sans-serif",
-                  fontWeight: 600,
-                  fontSize: '0.95rem',
-                  padding: '0.7rem 1.75rem',
-                  borderRadius: '50px',
-                  textDecoration: 'none',
-                  color: '#ffffff',
-                  background: 'var(--accent)',
-                  border: 'none',
-                  display: 'inline-block',
-                  transition: 'opacity 0.15s',
-                }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.opacity = '0.85')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.opacity = '1')
-                }
-              >
-                List Your Space
-              </Link>
-            </div>
+                <div
+                  style={{
+                    fontFamily: "'Orbitron', sans-serif",
+                    fontSize: '1.5rem',
+                    fontWeight: 900,
+                    color: 'var(--accent)',
+                    marginBottom: '0.75rem',
+                    lineHeight: 1,
+                  }}
+                >
+                  {card.num}
+                </div>
+                <h3
+                  style={{
+                    fontFamily: "'Orbitron', sans-serif",
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    color: 'var(--text-primary)',
+                    marginBottom: '0.75rem',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {card.title}
+                </h3>
+                <p
+                  style={{
+                    fontFamily: "'Exo 2', sans-serif",
+                    fontSize: '0.95rem',
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {card.body}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

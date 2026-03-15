@@ -205,11 +205,10 @@ export default function HomePage() {
       {/* Hero */}
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}>
-          QU Calendar — Your Non-Profit <span style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}
-            className="pride-gradient-text">LGBTQ+</span> Event Hub
+          QU — Your Queer Community, Synchronized
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-          A unified hub for discovering gatherings put on by and for our communities across Cincinnati, Northern Kentucky... and beyond.
+          Discover the events, spaces, and artists that make your Queer community alive — starting in Cincinnati, built for everywhere.
         </p>
       </div>
 

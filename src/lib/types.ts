@@ -16,6 +16,7 @@ export interface QUEvent {
   imageUrl?: string
   ticketLink?: string
   status: string
+  city?: string
 }
 
 export interface Space {
@@ -28,9 +29,10 @@ export interface Space {
   website?: string
   phone?: string
   amenities?: string[]
-  status?: string
+  status?: 'unverified' | 'pending' | 'approved' | 'rejected'
   braveSpace: boolean
   ownerUid: string
+  city?: string
 }
 
 export interface Artist {
@@ -42,7 +44,12 @@ export interface Artist {
   imageUrl?: string
   website?: string
   socialLinks?: Record<string, string>
-  status?: string
+  status?: 'invited' | 'pending' | 'approved' | 'rejected'
+  invitedBy?: string
+  approvedBy?: string
+  inviteToken?: string
+  joinedAt?: Timestamp
+  city?: string
 }
 
 export type SpaceType =
