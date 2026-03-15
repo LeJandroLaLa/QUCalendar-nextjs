@@ -56,68 +56,230 @@ export default function ArtistDetail({ id }: { id: string }) {
     )
   }
 
+  const today = new Date().toISOString().split('T')[0]
+  const upcomingShows = events.filter((e) => e.date >= today)
+  const pastShows = events.filter((e) => e.date < today)
+
   return (
-    <div>
-      <Link href="/artists" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>
-        ← Back to Artists
-      </Link>
+    <div style={{ fontFamily: "'Exo 2', sans-serif" }}>
 
-      {/* Hero image */}
-      {artist.imageUrl && (
+      {/* Banner */}
+      <div style={{
+        width: '100%',
+        height: '280px',
+        position: 'relative',
+        background: 'linear-gradient(135deg, rgba(228,3,3,0.4), rgba(115,41,130,0.5), rgba(0,128,38,0.3))',
+        overflow: 'hidden',
+      }}>
+        {artist.imageUrl && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${artist.imageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }} />
+        )}
+
+        {/* Pride stripe */}
         <div style={{
-          width: '100%',
-          height: '300px',
-          borderRadius: '12px',
-          overflow: 'hidden',
-          marginTop: '1rem',
-          backgroundImage: `url(${artist.imageUrl})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: 'var(--gradient-pride)',
         }} />
-      )}
 
-      <div style={{ marginTop: '1.5rem' }}>
-        <h1 style={{
+        {/* Artist type badge */}
+        <div style={{
+          position: 'absolute',
+          top: '1rem',
+          right: '1rem',
+          fontFamily: "'Orbitron', sans-serif",
+          fontSize: '0.7rem',
+          textTransform: 'uppercase',
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(5px)',
+          border: '1px solid rgba(255,255,255,0.3)',
+          borderRadius: '20px',
+          padding: '6px 16px',
+          color: '#fff',
+          letterSpacing: '0.1em',
+        }}>
+          Artist
+        </div>
+      </div>
+
+      {/* Header card */}
+      <div style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-glass)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '0 0 20px 20px',
+        borderTop: 'none',
+        padding: '0 2rem 2rem',
+        marginBottom: '2rem',
+      }}>
+        {/* Avatar */}
+        <div style={{
+          width: '120px',
+          height: '120px',
+          borderRadius: '16px',
+          marginTop: '-60px',
+          border: '3px solid rgba(255,255,255,0.4)',
+          boxShadow: '0 6px 16px rgba(0,0,0,0.4)',
+          background: 'linear-gradient(135deg, rgba(228,3,3,0.8), rgba(115,41,130,0.8))',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '3rem',
+          marginBottom: '1rem',
+        }}>
+          👑
+        </div>
+
+        <h2 style={{
           fontFamily: "'Orbitron', sans-serif",
           fontSize: '1.8rem',
           marginBottom: '0.5rem',
         }} className="pride-gradient-text">
           {artist.name}
-        </h1>
+        </h2>
 
-        {(artist.type || artist.genre) && (
-          <span style={{
-            display: 'inline-block',
-            padding: '0.3rem 0.8rem',
-            borderRadius: '999px',
-            background: 'rgba(117, 7, 135, 0.2)',
-            fontSize: '0.85rem',
-            color: 'var(--pride-violet)',
-            marginBottom: '1.5rem',
+        {artist.bio && (
+          <p style={{
+            color: 'var(--text-secondary)',
+            marginBottom: '1rem',
+            lineHeight: 1.6,
+            fontFamily: "'Exo 2', sans-serif",
           }}>
-            {artist.type}{artist.type && artist.genre ? ' · ' : ''}{artist.genre}
-          </span>
+            {artist.bio.slice(0, 120)}{artist.bio.length > 120 ? '…' : ''}
+          </p>
         )}
 
-        {/* Bio */}
-        {artist.bio && (
-          <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
-              Bio
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+          {artist.type && (
+            <span style={{
+              padding: '0.3rem 0.8rem',
+              borderRadius: '999px',
+              background: 'rgba(117,7,135,0.2)',
+              fontSize: '0.75rem',
+              color: 'var(--accent)',
+              fontFamily: "'Orbitron', sans-serif",
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}>
+              {artist.type}
+            </span>
+          )}
+          {artist.genre && (
+            <span style={{
+              padding: '0.3rem 0.8rem',
+              borderRadius: '999px',
+              background: 'rgba(0,128,38,0.15)',
+              fontSize: '0.75rem',
+              color: 'var(--accent)',
+              fontFamily: "'Orbitron', sans-serif",
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}>
+              {artist.genre}
+            </span>
+          )}
+          {artist.website && (
+            <a
+              href={artist.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '0.3rem 0.8rem',
+                borderRadius: '999px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                fontSize: '0.8rem',
+                fontFamily: "'Exo 2', sans-serif",
+              }}
+            >
+              🌐 Website
+            </a>
+          )}
+          {artist.socialLinks && Object.entries(artist.socialLinks).map(([platform, url]) => (
+            <a
+              key={platform}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '0.3rem 0.8rem',
+                borderRadius: '999px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                fontSize: '0.8rem',
+                fontFamily: "'Exo 2', sans-serif",
+                textTransform: 'capitalize',
+              }}
+            >
+              {platform}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Details grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: '1.5rem',
+        marginBottom: '2rem',
+      }}>
+        {/* Performance Types card */}
+        {artist.type && (
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-glass)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            padding: '1.5rem',
+          }}>
+            <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
+              Performance Types
             </h3>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-              {artist.bio}
-            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {artist.type.split(',').map((t) => t.trim()).filter(Boolean).map((t) => (
+                <span key={t} style={{
+                  padding: '0.3rem 0.8rem',
+                  borderRadius: '999px',
+                  background: 'rgba(117,7,135,0.15)',
+                  border: '1px solid rgba(117,7,135,0.3)',
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  fontFamily: "'Exo 2', sans-serif",
+                }}>
+                  {t}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Links */}
+        {/* Booking card */}
         {(artist.website || (artist.socialLinks && Object.keys(artist.socialLinks).length > 0)) && (
-          <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
-              Links
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-glass)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            padding: '1.5rem',
+          }}>
+            <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
+              Booking &amp; Links
             </h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {artist.website && (
                 <a
                   href={artist.website}
@@ -126,10 +288,11 @@ export default function ArtistDetail({ id }: { id: string }) {
                   style={{
                     padding: '0.4rem 1rem',
                     borderRadius: '999px',
-                    background: 'rgba(117, 7, 135, 0.2)',
-                    color: 'var(--pride-violet)',
+                    background: 'rgba(117,7,135,0.2)',
+                    color: 'var(--accent)',
                     textDecoration: 'none',
                     fontSize: '0.85rem',
+                    fontFamily: "'Exo 2', sans-serif",
                   }}
                 >
                   Website
@@ -144,10 +307,11 @@ export default function ArtistDetail({ id }: { id: string }) {
                   style={{
                     padding: '0.4rem 1rem',
                     borderRadius: '999px',
-                    background: 'rgba(255, 255, 255, 0.08)',
+                    background: 'rgba(255,255,255,0.08)',
                     color: 'var(--text-secondary)',
                     textDecoration: 'none',
                     fontSize: '0.85rem',
+                    fontFamily: "'Exo 2', sans-serif",
                     textTransform: 'capitalize',
                   }}
                 >
@@ -158,28 +322,105 @@ export default function ArtistDetail({ id }: { id: string }) {
           </div>
         )}
 
-        {/* Upcoming events */}
-        {events.length > 0 && (
-          <div style={{ marginTop: '2rem' }}>
-            <h3 style={{
-              fontFamily: "'Orbitron', sans-serif",
-              fontSize: '1rem',
-              marginBottom: '1rem',
-              color: 'var(--text-primary)',
-            }}>
-              Upcoming Events
+        {/* About card — full width */}
+        {artist.bio && (
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-glass)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            padding: '1.5rem',
+            gridColumn: '1 / -1',
+          }}>
+            <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
+              About
             </h3>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, whiteSpace: 'pre-wrap', fontFamily: "'Exo 2', sans-serif" }}>
+              {artist.bio}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Upcoming Shows section */}
+      {upcomingShows.length > 0 && (
+        <section style={{ marginBottom: '2rem' }}>
+          <h3 style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '1rem',
+            marginBottom: '1rem',
+            color: 'var(--text-primary)',
+            letterSpacing: '0.05em',
+          }}>
+            Upcoming Shows
+          </h3>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1rem',
+          }}>
+            {upcomingShows.map((e) => (
+              <EventCard key={e.id} event={e} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Past Shows section */}
+      {pastShows.length > 0 && (
+        <section style={{ marginBottom: '2rem' }}>
+          <h3 style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '1rem',
+            marginBottom: '1rem',
+            color: 'var(--text-primary)',
+            letterSpacing: '0.05em',
+          }}>
+            Past Shows
+          </h3>
+          <div style={{ opacity: 0.6 }}>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
               gap: '1rem',
             }}>
-              {events.map((e) => (
+              {pastShows.map((e) => (
                 <EventCard key={e.id} event={e} />
               ))}
             </div>
           </div>
-        )}
+        </section>
+      )}
+
+      {/* Heritage Vault placeholder */}
+      <div style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-glass)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '20px',
+        padding: '2rem',
+        marginTop: '2rem',
+        textAlign: 'center',
+      }}>
+        <h3 style={{
+          fontFamily: "'Orbitron', sans-serif",
+          fontSize: '1.1rem',
+          marginBottom: '0.75rem',
+          color: 'var(--text-primary)',
+          letterSpacing: '0.05em',
+        }}>
+          Heritage Vault
+        </h3>
+        <p style={{ color: 'var(--text-secondary)', fontFamily: "'Exo 2', sans-serif" }}>
+          The archive of this artist&apos;s journey lives here — coming soon
+        </p>
+      </div>
+
+      {/* Back link */}
+      <div style={{ marginTop: '2rem' }}>
+        <Link href="/artists" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem', fontFamily: "'Exo 2', sans-serif" }}>
+          ← Back to Artists
+        </Link>
       </div>
     </div>
   )
