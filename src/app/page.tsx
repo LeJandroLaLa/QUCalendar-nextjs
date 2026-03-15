@@ -205,7 +205,12 @@ export default function HomePage() {
       {/* Hero */}
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}>
-          QU — Your Queer Community, Synchronized
+          <span style={{
+            background: 'linear-gradient(90deg, #FF3B3B, #9B3DB8)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>QU</span> — Your Queer Community, Synchronized
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
           Discover the events, spaces, and artists that make your Queer community alive — starting in Cincinnati, built for everywhere.
