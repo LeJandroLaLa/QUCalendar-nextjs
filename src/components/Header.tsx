@@ -70,7 +70,7 @@ export default function Header() {
             fontSize: '0.85rem',
             color: 'var(--text-secondary)',
           }}>
-            Stardate {stardate}
+            {stardate}
           </span>
           <VibeToggle />
         </div>
