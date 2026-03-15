@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import VibeToggle from './VibeToggle'
 
 function getStardate(): string {
   const now = new Date()
@@ -63,13 +64,16 @@ export default function Header() {
             QU Calendar
           </h1>
         </Link>
-        <span style={{
-          fontFamily: "'Orbitron', sans-serif",
-          fontSize: '0.85rem',
-          color: 'var(--text-secondary)',
-        }}>
-          Stardate {stardate}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <span style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '0.85rem',
+            color: 'var(--text-secondary)',
+          }}>
+            Stardate {stardate}
+          </span>
+          <VibeToggle />
+        </div>
       </div>
 
       <nav style={{

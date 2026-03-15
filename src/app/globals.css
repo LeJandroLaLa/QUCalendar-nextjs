@@ -13,6 +13,16 @@
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --gradient-pride: linear-gradient(90deg, #E40303, #FF8C00, #FFED00, #008026, #24408E, #732982);
+  --accent: #00B4B4;
+}
+
+[data-vibe="day"] {
+  --bg-dark: #FDF6EC;
+  --bg-card: rgba(180, 100, 40, 0.08);
+  --border-glass: rgba(180, 100, 40, 0.2);
+  --text-primary: #2C1A0E;
+  --text-secondary: rgba(44, 26, 14, 0.65);
+  --accent: #B5541F;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
