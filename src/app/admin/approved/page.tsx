@@ -24,7 +24,7 @@ export default function ApprovedContentPage() {
   const fetchItems = async (tab: Tab) => {
     setLoading(true)
     try {
-      const collectionName = tab === 'spaces' ? 'venues' : tab // TODO: migrate Firestore collection from 'venues' to 'spaces'
+      const collectionName = tab
       const snap = await getDocs(
         query(collection(db, collectionName), where('status', '==', 'approved'))
       )
@@ -56,7 +56,7 @@ export default function ApprovedContentPage() {
   const handleUnpublish = async (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id))
     try {
-      const collectionName = activeTab === 'spaces' ? 'venues' : activeTab // TODO: migrate Firestore collection from 'venues' to 'spaces'
+      const collectionName = activeTab
       await updateDoc(doc(db, collectionName, id), { status: 'archived' })
     } catch (err) {
       console.error('Error archiving item:', err)

@@ -65,7 +65,7 @@ export default function SubmitSpacePage() {
     setError('')
     setSubmitting(true)
     try {
-      await addDoc(collection(db, 'venues'), { // TODO: migrate Firestore collection from 'venues' to 'spaces'
+      await addDoc(collection(db, 'spaces'), {
         name: form.name.trim(),
         type: form.type,
         address: form.address.trim(),

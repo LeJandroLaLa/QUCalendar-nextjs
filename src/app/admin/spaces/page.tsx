@@ -25,7 +25,7 @@ export default function AdminSpacesPage() {
     const fetchPending = async () => {
       try {
         const snap = await getDocs(
-          query(collection(db, 'venues'), where('status', '==', 'pending')) // TODO: migrate Firestore collection from 'venues' to 'spaces'
+          query(collection(db, 'spaces'), where('status', '==', 'pending'))
         )
         setSpaces(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as PendingSpace))
       } catch (err) {
@@ -41,12 +41,12 @@ export default function AdminSpacesPage() {
     // Optimistic UI update
     setSpaces((prev) => prev.filter((s) => s.id !== id))
     try {
-      await updateDoc(doc(db, 'venues', id), { status }) // TODO: migrate Firestore collection from 'venues' to 'spaces'
+      await updateDoc(doc(db, 'spaces', id), { status })
     } catch (err) {
       console.error(`Error setting space to ${status}:`, err)
       // Refetch on error
       const snap = await getDocs(
-        query(collection(db, 'venues'), where('status', '==', 'pending')) // TODO: migrate Firestore collection from 'venues' to 'spaces'
+        query(collection(db, 'spaces'), where('status', '==', 'pending'))
       )
       setSpaces(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as PendingSpace))
     }

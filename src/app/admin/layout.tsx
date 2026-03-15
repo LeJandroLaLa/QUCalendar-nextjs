@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     // Live count listeners for pending items
     const unsubSpaces = onSnapshot(
-      query(collection(db, 'venues'), where('status', '==', 'pending')), // TODO: migrate Firestore collection from 'venues' to 'spaces'
+      query(collection(db, 'spaces'), where('status', '==', 'pending')),
       (snap) => setCounts((prev) => ({ ...prev, spaces: snap.size }))
     )
     const unsubArtists = onSnapshot(

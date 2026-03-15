@@ -18,7 +18,7 @@ export default function SpacesPage() {
     const fetchSpaces = async () => {
       try {
         const q = query(
-          collection(db, 'venues'), // TODO: migrate Firestore collection from 'venues' to 'spaces'
+          collection(db, 'spaces'),
           where('status', '==', 'approved')
         )
         const snapshot = await getDocs(q)

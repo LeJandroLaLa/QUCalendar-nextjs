@@ -106,7 +106,7 @@ export default function HomePage() {
       try {
         const [eventsSnap, spacesSnap] = await Promise.all([
           getDocs(query(collection(db, 'events'), where('status', '==', 'approved'))),
-          getDocs(query(collection(db, 'venues'), where('status', '==', 'approved'))), // TODO: migrate Firestore collection from 'venues' to 'spaces'
+          getDocs(query(collection(db, 'spaces'), where('status', '==', 'approved'))),
         ])
         const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
         const today = formatDateMDY(new Date())

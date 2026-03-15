@@ -16,7 +16,7 @@ export default function SpaceDetail({ id }: { id: string }) {
   useEffect(() => {
     const fetchSpace = async () => {
       try {
-        const docRef = doc(db, 'venues', id) // TODO: migrate Firestore collection from 'venues' to 'spaces'
+        const docRef = doc(db, 'spaces', id)
         const snap = await getDoc(docRef)
         if (snap.exists()) {
           setSpace({ id: snap.id, ...snap.data() } as Space)

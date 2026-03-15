@@ -39,7 +39,7 @@ export default function SubmitEventPage() {
     const fetchOptions = async () => {
       try {
         const [spaceSnap, artistSnap] = await Promise.all([
-          getDocs(query(collection(db, 'venues'), where('status', '==', 'approved'))), // TODO: migrate Firestore collection from 'venues' to 'spaces'
+          getDocs(query(collection(db, 'spaces'), where('status', '==', 'approved'))),
           getDocs(query(collection(db, 'artists'), where('status', '==', 'approved'))),
         ])
         setSpaces(spaceSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as Space))
