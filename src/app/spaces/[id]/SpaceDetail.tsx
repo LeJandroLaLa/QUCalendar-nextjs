@@ -3,25 +3,25 @@
 import { useEffect, useState } from 'react'
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { Venue, QUEvent } from '@/lib/types'
+import { Space, QUEvent } from '@/lib/types'
 import EventCard from '@/components/EventCard'
 import Link from 'next/link'
 
-export default function VenueDetail({ id }: { id: string }) {
-  const [venue, setVenue] = useState<Venue | null>(null)
+export default function SpaceDetail({ id }: { id: string }) {
+  const [space, setSpace] = useState<Space | null>(null)
   const [events, setEvents] = useState<QUEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const fetchVenue = async () => {
+    const fetchSpace = async () => {
       try {
-        const docRef = doc(db, 'venues', id)
+        const docRef = doc(db, 'venues', id) // TODO: migrate Firestore collection from 'venues' to 'spaces'
         const snap = await getDoc(docRef)
         if (snap.exists()) {
-          setVenue({ id: snap.id, ...snap.data() } as Venue)
+          setSpace({ id: snap.id, ...snap.data() } as Space)
 
-          // Fetch upcoming events at this venue
+          // Fetch upcoming events at this space
           const evQ = query(
             collection(db, 'events'),
             where('status', '==', 'approved'),
@@ -31,46 +31,46 @@ export default function VenueDetail({ id }: { id: string }) {
           const evSnap = await getDocs(evQ)
           setEvents(evSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as QUEvent))
         } else {
-          setError('Venue not found')
+          setError('Space not found')
         }
       } catch (err) {
-        console.error('Error fetching venue:', err)
-        setError('Failed to load venue')
+        console.error('Error fetching space:', err)
+        setError('Failed to load space')
       } finally {
         setLoading(false)
       }
     }
-    if (id) fetchVenue()
+    if (id) fetchSpace()
   }, [id])
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading venue...</div>
+    return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading space...</div>
   }
 
-  if (error || !venue) {
+  if (error || !space) {
     return (
       <div style={{ textAlign: 'center', padding: '3rem' }}>
-        <p style={{ color: 'var(--pride-red)', marginBottom: '1rem' }}>{error || 'Venue not found'}</p>
-        <Link href="/venues" style={{ color: 'var(--pride-violet)', textDecoration: 'none' }}>← Back to Venues</Link>
+        <p style={{ color: 'var(--pride-red)', marginBottom: '1rem' }}>{error || 'Space not found'}</p>
+        <Link href="/spaces" style={{ color: 'var(--pride-violet)', textDecoration: 'none' }}>← Back to Spaces</Link>
       </div>
     )
   }
 
   return (
     <div>
-      <Link href="/venues" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>
-        ← Back to Venues
+      <Link href="/spaces" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>
+        ← Back to Spaces
       </Link>
 
       {/* Hero image */}
-      {venue.imageUrl && (
+      {space.imageUrl && (
         <div style={{
           width: '100%',
           height: '300px',
           borderRadius: '12px',
           overflow: 'hidden',
           marginTop: '1rem',
-          backgroundImage: `url(${venue.imageUrl})`,
+          backgroundImage: `url(${space.imageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }} />
@@ -82,10 +82,10 @@ export default function VenueDetail({ id }: { id: string }) {
           fontSize: '1.8rem',
           marginBottom: '0.5rem',
         }} className="pride-gradient-text">
-          {venue.name}
+          {space.name}
         </h1>
 
-        {venue.type && (
+        {space.type && (
           <span style={{
             display: 'inline-block',
             padding: '0.3rem 0.8rem',
@@ -95,35 +95,35 @@ export default function VenueDetail({ id }: { id: string }) {
             color: 'var(--pride-violet)',
             marginBottom: '1.5rem',
           }}>
-            {venue.type}
+            {space.type}
           </span>
         )}
 
         {/* Details */}
         <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {venue.address && (
+            {space.address && (
               <div>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Address</p>
-                <p style={{ color: 'var(--text-primary)' }}>{venue.address}</p>
+                <p style={{ color: 'var(--text-primary)' }}>{space.address}</p>
               </div>
             )}
-            {venue.phone && (
+            {space.phone && (
               <div>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Phone</p>
-                <p style={{ color: 'var(--text-primary)' }}>{venue.phone}</p>
+                <p style={{ color: 'var(--text-primary)' }}>{space.phone}</p>
               </div>
             )}
-            {venue.website && (
+            {space.website && (
               <div>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Website</p>
                 <a
-                  href={venue.website}
+                  href={space.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: 'var(--pride-violet)', textDecoration: 'none' }}
                 >
-                  {venue.website}
+                  {space.website}
                 </a>
               </div>
             )}
@@ -131,25 +131,25 @@ export default function VenueDetail({ id }: { id: string }) {
         </div>
 
         {/* Description */}
-        {venue.description && (
+        {space.description && (
           <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
             <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
               About
             </h3>
             <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-              {venue.description}
+              {space.description}
             </p>
           </div>
         )}
 
         {/* Amenities */}
-        {venue.amenities && venue.amenities.length > 0 && (
+        {space.amenities && space.amenities.length > 0 && (
           <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
             <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
               Amenities
             </h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {venue.amenities.map((amenity) => (
+              {space.amenities.map((amenity) => (
                 <span key={amenity} style={{
                   padding: '0.3rem 0.8rem',
                   borderRadius: '999px',

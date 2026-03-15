@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { QUEvent, Venue, EVENT_CATEGORIES, VENUE_TYPES, VenueType } from '@/lib/types'
+import { QUEvent, Space, EVENT_CATEGORIES, SPACE_TYPES, SpaceType } from '@/lib/types'
 import Link from 'next/link'
 
 const categoryNames = Object.keys(EVENT_CATEGORIES)
@@ -96,27 +96,27 @@ export default function HomePage() {
   const [dateFilter, setDateFilter] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [showCategoryGrid, setShowCategoryGrid] = useState(true)
-  const [selectedVenueTypes, setSelectedVenueTypes] = useState<VenueType[]>([])
-  const [showVenueTypeGrid, setShowVenueTypeGrid] = useState(true)
-  const [venueTypeMap, setVenueTypeMap] = useState<Map<string, VenueType>>(new Map())
+  const [selectedSpaceTypes, setSelectedSpaceTypes] = useState<SpaceType[]>([])
+  const [showSpaceTypeGrid, setShowSpaceTypeGrid] = useState(true)
+  const [spaceTypeMap, setSpaceTypeMap] = useState<Map<string, SpaceType>>(new Map())
 
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true)
       try {
-        const [eventsSnap, venuesSnap] = await Promise.all([
+        const [eventsSnap, spacesSnap] = await Promise.all([
           getDocs(query(collection(db, 'events'), where('status', '==', 'approved'))),
-          getDocs(query(collection(db, 'venues'), where('status', '==', 'approved'))),
+          getDocs(query(collection(db, 'venues'), where('status', '==', 'approved'))), // TODO: migrate Firestore collection from 'venues' to 'spaces'
         ])
         const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
         const today = formatDateMDY(new Date())
         setEvents(fetched.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)))
-        const map = new Map<string, VenueType>()
-        venuesSnap.docs.forEach(doc => {
-          const v = { id: doc.id, ...doc.data() } as Venue
-          if (v.type) map.set(v.id, v.type)
+        const map = new Map<string, SpaceType>()
+        spacesSnap.docs.forEach(doc => {
+          const s = { id: doc.id, ...doc.data() } as Space
+          if (s.type) map.set(s.id, s.type)
         })
-        setVenueTypeMap(map)
+        setSpaceTypeMap(map)
       } catch (err) {
         console.error('Error fetching data:', err)
       } finally {
@@ -135,7 +135,7 @@ export default function HomePage() {
     setKeyword('')
     setDateFilter('')
     setSelectedCategories([])
-    setSelectedVenueTypes([])
+    setSelectedSpaceTypes([])
   }
 
   const toggleCategory = (cat: string) => {
@@ -144,8 +144,8 @@ export default function HomePage() {
     )
   }
 
-  const toggleVenueType = (vt: VenueType) => {
-    setSelectedVenueTypes(prev =>
+  const toggleSpaceType = (vt: SpaceType) => {
+    setSelectedSpaceTypes(prev =>
       prev.includes(vt) ? prev.filter(t => t !== vt) : [...prev, vt]
     )
   }
@@ -181,16 +181,16 @@ export default function HomePage() {
       evts = evts.filter(e => selectedCategories.includes(e.category))
     }
 
-    if (selectedVenueTypes.length > 0) {
+    if (selectedSpaceTypes.length > 0) {
       evts = evts.filter(e => {
         if (!e.venueId) return false
-        const vt = venueTypeMap.get(e.venueId)
-        return vt !== undefined && selectedVenueTypes.includes(vt)
+        const vt = spaceTypeMap.get(e.venueId)
+        return vt !== undefined && selectedSpaceTypes.includes(vt)
       })
     }
 
     return evts
-  }, [events, locationQuery, keyword, dateFilter, selectedCategories, selectedVenueTypes, venueTypeMap])
+  }, [events, locationQuery, keyword, dateFilter, selectedCategories, selectedSpaceTypes, spaceTypeMap])
 
   const dayGroups = useMemo(() => groupByDay(filteredEvents), [filteredEvents])
 
@@ -283,36 +283,36 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Venue Type sub-section */}
-        <button onClick={() => setShowVenueTypeGrid(v => !v)} style={{
+        {/* Space Type sub-section */}
+        <button onClick={() => setShowSpaceTypeGrid(v => !v)} style={{
           background: 'none', border: 'none', color: 'var(--text-secondary)',
           cursor: 'pointer', fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
           padding: '0.25rem 0', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
         }}>
-          {showVenueTypeGrid ? '▼' : '▶'} Filter by Venue Type
-          {selectedVenueTypes.length > 0 && (
+          {showSpaceTypeGrid ? '▼' : '▶'} Filter by Space Type
+          {selectedSpaceTypes.length > 0 && (
             <span style={{ color: 'var(--pride-yellow)', fontSize: '0.75rem' }}>
-              ({selectedVenueTypes.length} active)
+              ({selectedSpaceTypes.length} active)
             </span>
           )}
         </button>
 
-        {showVenueTypeGrid && (
+        {showSpaceTypeGrid && (
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
             gap: '0.5rem', marginTop: '0.75rem',
           }}>
-            {(Object.keys(VENUE_TYPES) as VenueType[]).map(vt => (
-              <div key={vt} onClick={() => toggleVenueType(vt)} style={{
+            {(Object.keys(SPACE_TYPES) as SpaceType[]).map(vt => (
+              <div key={vt} onClick={() => toggleSpaceType(vt)} style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 padding: '0.5rem 0.25rem', borderRadius: '8px', cursor: 'pointer',
-                background: selectedVenueTypes.includes(vt)
+                background: selectedSpaceTypes.includes(vt)
                   ? 'rgba(117,7,135,0.4)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${selectedVenueTypes.includes(vt) ? 'rgba(117,7,135,0.8)' : 'var(--border-glass)'}`,
+                border: `1px solid ${selectedSpaceTypes.includes(vt) ? 'rgba(117,7,135,0.8)' : 'var(--border-glass)'}`,
                 transition: 'all 0.15s',
                 userSelect: 'none',
               }}>
-                <span style={{ fontSize: '1.3rem' }}>{VENUE_TYPES[vt]}</span>
+                <span style={{ fontSize: '1.3rem' }}>{SPACE_TYPES[vt]}</span>
                 <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.2rem', lineHeight: 1.2 }}>{vt}</span>
               </div>
             ))}

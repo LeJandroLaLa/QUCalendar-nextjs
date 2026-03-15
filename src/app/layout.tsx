@@ -14,7 +14,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try { var v = localStorage.getItem('qu-vibe') || 'night'; document.documentElement.setAttribute('data-vibe', v); } catch(e) {}`,
+          }}
+        />
+      </head>
       <body>
         <AuthProvider>
           <Header />

@@ -7,14 +7,14 @@ import Link from 'next/link'
 
 interface RecentItem {
   id: string
-  type: 'venue' | 'artist' | 'event'
+  type: 'space' | 'artist' | 'event'
   name: string
   status: string
   submittedAt: string
 }
 
 export default function AdminDashboard() {
-  const [counts, setCounts] = useState({ pendingVenues: 0, pendingArtists: 0, pendingEvents: 0 })
+  const [counts, setCounts] = useState({ pendingSpaces: 0, pendingArtists: 0, pendingEvents: 0 })
   const [recent, setRecent] = useState<RecentItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -22,12 +22,12 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         const [pv, pa, pe] = await Promise.all([
-          getDocs(query(collection(db, 'venues'), where('status', '==', 'pending'))),
+          getDocs(query(collection(db, 'venues'), where('status', '==', 'pending'))), // TODO: migrate Firestore collection from 'venues' to 'spaces'
           getDocs(query(collection(db, 'artists'), where('status', '==', 'pending'))),
           getDocs(query(collection(db, 'events'), where('status', '==', 'pending'))),
         ])
         setCounts({
-          pendingVenues: pv.size,
+          pendingSpaces: pv.size,
           pendingArtists: pa.size,
           pendingEvents: pe.size,
         })
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
         // Fetch recent submissions across all collections
         const recentItems: RecentItem[] = []
         const collections = [
-          { name: 'venues', type: 'venue' as const, field: 'name' },
+          { name: 'venues', type: 'space' as const, field: 'name' }, // TODO: migrate Firestore collection from 'venues' to 'spaces'
           { name: 'artists', type: 'artist' as const, field: 'name' },
           { name: 'events', type: 'event' as const, field: 'title' },
         ]
@@ -72,7 +72,7 @@ export default function AdminDashboard() {
   }, [])
 
   const summaryCards = [
-    { label: 'Pending Venues', count: counts.pendingVenues, href: '/admin/venues', color: 'var(--pride-red)' },
+    { label: 'Pending Spaces', count: counts.pendingSpaces, href: '/admin/spaces', color: 'var(--pride-red)' },
     { label: 'Pending Artists', count: counts.pendingArtists, href: '/admin/artists', color: 'var(--pride-orange)' },
     { label: 'Pending Events', count: counts.pendingEvents, href: '/admin/events', color: 'var(--pride-violet)' },
   ]

@@ -124,9 +124,9 @@ export default function EventDetail({ id }: { id: string }) {
             )}
             {event.venue && (
               <div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Venue</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Space</p>
                 {event.venueId ? (
-                  <Link href={`/venues/${event.venueId}`} style={{ color: 'var(--pride-violet)', textDecoration: 'none' }}>
+                  <Link href={`/spaces/${event.venueId}`} style={{ color: 'var(--pride-violet)', textDecoration: 'none' }}>
                     {event.venue}
                   </Link>
                 ) : (

@@ -13,7 +13,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, loading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const [counts, setCounts] = useState({ venues: 0, artists: 0, events: 0 })
+  const [counts, setCounts] = useState({ spaces: 0, artists: 0, events: 0 })
 
   useEffect(() => {
     if (loading) return
@@ -23,9 +23,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     // Live count listeners for pending items
-    const unsubVenues = onSnapshot(
-      query(collection(db, 'venues'), where('status', '==', 'pending')),
-      (snap) => setCounts((prev) => ({ ...prev, venues: snap.size }))
+    const unsubSpaces = onSnapshot(
+      query(collection(db, 'venues'), where('status', '==', 'pending')), // TODO: migrate Firestore collection from 'venues' to 'spaces'
+      (snap) => setCounts((prev) => ({ ...prev, spaces: snap.size }))
     )
     const unsubArtists = onSnapshot(
       query(collection(db, 'artists'), where('status', '==', 'pending')),
@@ -37,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     )
 
     return () => {
-      unsubVenues()
+      unsubSpaces()
       unsubArtists()
       unsubEvents()
     }
@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', count: 0 },
-    { href: '/admin/venues', label: 'Pending Venues', count: counts.venues },
+    { href: '/admin/spaces', label: 'Pending Spaces', count: counts.spaces },
     { href: '/admin/artists', label: 'Pending Artists', count: counts.artists },
     { href: '/admin/events', label: 'Pending Events', count: counts.events },
     { href: '/admin/approved', label: 'Approved Content', count: 0 },
