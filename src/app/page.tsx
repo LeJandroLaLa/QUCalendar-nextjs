@@ -99,6 +99,7 @@ export default function HomePage() {
   const [selectedSpaceTypes, setSelectedSpaceTypes] = useState<SpaceType[]>([])
   const [showSpaceTypeGrid, setShowSpaceTypeGrid] = useState(true)
   const [spaceTypeMap, setSpaceTypeMap] = useState<Map<string, SpaceType>>(new Map())
+  const [ageFilter, setAgeFilter] = useState<string>('')
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -136,6 +137,7 @@ export default function HomePage() {
     setDateFilter('')
     setSelectedCategories([])
     setSelectedSpaceTypes([])
+    setAgeFilter('')
   }
 
   const toggleCategory = (cat: string) => {
@@ -189,8 +191,12 @@ export default function HomePage() {
       })
     }
 
+    if (ageFilter) {
+      evts = evts.filter(e => e.ageRestriction === ageFilter)
+    }
+
     return evts
-  }, [events, locationQuery, keyword, dateFilter, selectedCategories, selectedSpaceTypes, spaceTypeMap])
+  }, [events, locationQuery, keyword, dateFilter, selectedCategories, selectedSpaceTypes, spaceTypeMap, ageFilter])
 
   const dayGroups = useMemo(() => groupByDay(filteredEvents), [filteredEvents])
 
@@ -322,6 +328,34 @@ export default function HomePage() {
             ))}
           </div>
         )}
+
+        {/* Age Restriction sub-section */}
+        <div style={{
+          color: 'var(--text-secondary)',
+          fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
+          padding: '0.25rem 0', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
+        }}>
+          Filter by Age
+          {ageFilter && (
+            <span style={{ color: 'var(--pride-yellow)', fontSize: '0.75rem' }}>
+              (1 active)
+            </span>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+          {([{ label: 'All Ages', emoji: '🌈' }, { label: '18+', emoji: '🔞' }, { label: '21+', emoji: '🍺' }] as const).map(opt => (
+            <button key={opt.label} onClick={() => setAgeFilter(prev => prev === opt.label ? '' : opt.label)} style={{
+              padding: '0.4rem 1.25rem', borderRadius: '20px', cursor: 'pointer',
+              fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
+              background: ageFilter === opt.label ? 'rgba(115,41,130,0.5)' : 'rgba(255,255,255,0.05)',
+              border: ageFilter === opt.label ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
+              color: 'var(--text-primary)',
+              transition: 'all 0.15s',
+            }}>
+              {opt.emoji} {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* View toggle */}
