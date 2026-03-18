@@ -37,7 +37,7 @@ export default function Header() {
   return (
     <header style={{
       borderBottom: '1px solid var(--border-glass)',
-      background: 'rgba(10, 10, 15, 0.95)',
+      background: 'var(--header-bg)',
       backdropFilter: 'blur(10px)',
       position: 'sticky',
       top: 0,
