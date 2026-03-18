@@ -146,7 +146,7 @@ export interface QUEvent {
   artistIds?: string[]
   unregisteredPerformers?: UnregisteredPerformer[]
   vendors?: Vendor[]
-  category: string
+  category?: string
   tags?: string[]
   imageUrl?: string
   ticketLink?: string
@@ -206,7 +206,7 @@ export interface VaultEntry {
 export const VAULT_ENTRIES_PATH = 'spaces/{spaceId}/vault_entries/{entryId}'
 
 // ─────────────────────────────────────────
-// EVENT CATEGORIES
+// EVENT CATEGORIES (kept for backward compatibility with admin pages)
 // ─────────────────────────────────────────
 export const EVENT_CATEGORIES: Record<string, string> = {
   'Drag Show': '🎭',
@@ -234,3 +234,88 @@ export const EVENT_CATEGORIES: Record<string, string> = {
   'Global Majority': '🌍',
   'Giving Back': '🩷',
 }
+
+// ─────────────────────────────────────────
+// EVENT TAGS
+// ─────────────────────────────────────────
+export const EVENT_TAGS = {
+  performance: {
+    label: 'Performance',
+    tags: [
+      { tag: 'Drag', emoji: '🎭' },
+      { tag: 'Burlesque', emoji: '💋' },
+      { tag: 'Live Music', emoji: '🎵' },
+      { tag: 'Live DJ', emoji: '🎛️' },
+      { tag: 'Open Mic', emoji: '🎤' },
+      { tag: 'Theater', emoji: '🎪' },
+      { tag: 'Comedy', emoji: '😂' },
+      { tag: 'Poetry', emoji: '📝' },
+      { tag: 'Dance', emoji: '💃' },
+    ]
+  },
+  vibe: {
+    label: 'Vibe',
+    tags: [
+      { tag: 'Nightlife', emoji: '🌙' },
+      { tag: 'Late Night', emoji: '🌃' },
+      { tag: 'All Ages', emoji: '🌈' },
+      { tag: 'Sober Friendly', emoji: '💧' },
+      { tag: 'Chill', emoji: '✨' },
+      { tag: 'Underground', emoji: '⚡' },
+    ]
+  },
+  spaceType: {
+    label: 'Space Type',
+    tags: [
+      { tag: 'Bar', emoji: '🍺' },
+      { tag: 'Club', emoji: '🌟' },
+      { tag: 'Restaurant', emoji: '🍽️' },
+      { tag: 'Brunch', emoji: '🥞' },
+      { tag: 'Outdoor', emoji: '🌳' },
+      { tag: 'Pop-Up', emoji: '🎪' },
+    ]
+  },
+  community: {
+    label: 'Community',
+    tags: [
+      { tag: 'Pride', emoji: '🏳️‍🌈' },
+      { tag: 'Fundraiser', emoji: '🩷' },
+      { tag: 'Workshop', emoji: '📚' },
+      { tag: 'Support Group', emoji: '🤝' },
+      { tag: 'Social', emoji: '☕' },
+      { tag: 'Giving Back', emoji: '💝' },
+      { tag: 'Activism', emoji: '✊' },
+    ]
+  },
+  identity: {
+    label: 'Identity & Community',
+    tags: [
+      { tag: 'Trans Community', emoji: '⚧️' },
+      { tag: 'Global Majority', emoji: '🌍' },
+      { tag: 'Indigenous', emoji: '🌱' },
+      { tag: 'Leather & Kink', emoji: '🔗' },
+      { tag: 'Bears', emoji: '🐻' },
+      { tag: 'Femme', emoji: '👄' },
+    ]
+  },
+  artCulture: {
+    label: 'Art & Culture',
+    tags: [
+      { tag: 'Art Show', emoji: '🎨' },
+      { tag: 'Film', emoji: '🎬' },
+      { tag: 'Gaming', emoji: '🎮' },
+      { tag: 'Fashion', emoji: '👗' },
+      { tag: 'Market', emoji: '🛍️' },
+    ]
+  },
+  age: {
+    label: 'Age',
+    tags: [
+      { tag: 'All Ages', emoji: '🌈' },
+      { tag: '18+', emoji: '🔞' },
+      { tag: '21+', emoji: '🍺' },
+    ]
+  },
+} as const
+
+export type EventTag = string

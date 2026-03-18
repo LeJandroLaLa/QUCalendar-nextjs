@@ -3,10 +3,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { QUEvent, Space, EVENT_CATEGORIES, SPACE_TYPES, SpaceType } from '@/lib/types'
+import { QUEvent, EVENT_TAGS } from '@/lib/types'
 import Link from 'next/link'
-
-const categoryNames = Object.keys(EVENT_CATEGORIES)
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
   'July','August','September','October','November','December']
@@ -94,30 +92,21 @@ export default function HomePage() {
   const [locationQuery, setLocationQuery] = useState('')
   const [keyword, setKeyword] = useState('')
   const [dateFilter, setDateFilter] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [showCategoryGrid, setShowCategoryGrid] = useState(true)
-  const [selectedSpaceTypes, setSelectedSpaceTypes] = useState<SpaceType[]>([])
-  const [showSpaceTypeGrid, setShowSpaceTypeGrid] = useState(true)
-  const [spaceTypeMap, setSpaceTypeMap] = useState<Map<string, SpaceType>>(new Map())
-  const [ageFilter, setAgeFilter] = useState<string>('')
+  const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(Object.keys(EVENT_TAGS))
+  )
 
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true)
       try {
-        const [eventsSnap, spacesSnap] = await Promise.all([
-          getDocs(query(collection(db, 'events'), where('status', '==', 'approved'))),
-          getDocs(query(collection(db, 'spaces'), where('status', '==', 'approved'))),
-        ])
+        const eventsSnap = await getDocs(
+          query(collection(db, 'events'), where('status', '==', 'approved'))
+        )
         const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
         const today = formatDateMDY(new Date())
         setEvents(fetched.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)))
-        const map = new Map<string, SpaceType>()
-        spacesSnap.docs.forEach(doc => {
-          const s = { id: doc.id, ...doc.data() } as Space
-          if (s.type) map.set(s.id, s.type)
-        })
-        setSpaceTypeMap(map)
       } catch (err) {
         console.error('Error fetching data:', err)
       } finally {
@@ -135,21 +124,25 @@ export default function HomePage() {
     setLocationQuery('')
     setKeyword('')
     setDateFilter('')
-    setSelectedCategories([])
-    setSelectedSpaceTypes([])
-    setAgeFilter('')
+    setActiveTags(new Set())
   }
 
-  const toggleCategory = (cat: string) => {
-    setSelectedCategories(prev =>
-      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-    )
+  const toggleTag = (tag: string) => {
+    setActiveTags(prev => {
+      const next = new Set(prev)
+      if (next.has(tag)) next.delete(tag)
+      else next.add(tag)
+      return next
+    })
   }
 
-  const toggleSpaceType = (vt: SpaceType) => {
-    setSelectedSpaceTypes(prev =>
-      prev.includes(vt) ? prev.filter(t => t !== vt) : [...prev, vt]
-    )
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
   }
 
   const filteredEvents = useMemo(() => {
@@ -179,24 +172,15 @@ export default function HomePage() {
       evts = evts.filter(e => e.date === dateFilter)
     }
 
-    if (selectedCategories.length > 0) {
-      evts = evts.filter(e => selectedCategories.includes(e.category))
-    }
-
-    if (selectedSpaceTypes.length > 0) {
+    if (activeTags.size > 0) {
       evts = evts.filter(e => {
-        if (!e.venueId) return false
-        const vt = spaceTypeMap.get(e.venueId)
-        return vt !== undefined && selectedSpaceTypes.includes(vt)
+        const eventTags = e.tags || []
+        return Array.from(activeTags).every(tag => eventTags.includes(tag))
       })
     }
 
-    if (ageFilter) {
-      evts = evts.filter(e => e.ageRestriction === ageFilter)
-    }
-
     return evts
-  }, [events, locationQuery, keyword, dateFilter, selectedCategories, selectedSpaceTypes, spaceTypeMap, ageFilter])
+  }, [events, locationQuery, keyword, dateFilter, activeTags])
 
   const dayGroups = useMemo(() => groupByDay(filteredEvents), [filteredEvents])
 
@@ -225,6 +209,7 @@ export default function HomePage() {
 
       {/* Filter bar */}
       <div className="glass-card" style={{ padding: '1rem', marginBottom: '1rem' }}>
+        {/* Search row */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
           <input type="text" placeholder="Search all events..." value={keyword}
             onChange={e => setKeyword(e.target.value)}
@@ -257,105 +242,83 @@ export default function HomePage() {
           }}>Clear</button>
         </div>
 
-        {/* Event Type sub-section */}
-        <button onClick={() => setShowCategoryGrid(v => !v)} style={{
-          background: 'none', border: 'none', color: 'var(--text-secondary)',
-          cursor: 'pointer', fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
-          padding: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem',
-        }}>
-          {showCategoryGrid ? '▼' : '▶'} Filter by Event Type
-          {selectedCategories.length > 0 && (
-            <span style={{ color: 'var(--pride-yellow)', fontSize: '0.75rem' }}>
-              ({selectedCategories.length} active)
-            </span>
-          )}
-        </button>
+        {/* Tag group sections */}
+        {(Object.entries(EVENT_TAGS) as [string, { label: string; tags: readonly { tag: string; emoji: string }[] }][]).map(([key, group]) => {
+          const activeInGroup = group.tags.filter(t => activeTags.has(t.tag)).length
+          const isExpanded = expandedSections.has(key)
+          return (
+            <div key={key} style={{ marginTop: '0.75rem' }}>
+              <button
+                onClick={() => toggleSection(key)}
+                style={{
+                  background: 'none', border: 'none', color: 'var(--text-secondary)',
+                  cursor: 'pointer', fontFamily: "'Orbitron', sans-serif", fontSize: '0.72rem',
+                  padding: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  fontVariant: 'small-caps', letterSpacing: '0.05em',
+                }}
+              >
+                {isExpanded ? '▼' : '▶'} {group.label}
+                {activeInGroup > 0 && (
+                  <span style={{
+                    background: 'rgba(155,61,184,0.35)',
+                    border: '1px solid var(--pride-violet)',
+                    borderRadius: '20px', padding: '0 0.5rem',
+                    fontSize: '0.68rem', color: 'var(--text-primary)',
+                  }}>
+                    {activeInGroup}
+                  </span>
+                )}
+              </button>
 
-        {showCategoryGrid && (
+              {isExpanded && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  {group.tags.map(({ tag, emoji }) => {
+                    const isActive = activeTags.has(tag)
+                    return (
+                      <button
+                        key={tag}
+                        onClick={() => toggleTag(tag)}
+                        style={{
+                          padding: '0.35rem 0.75rem', borderRadius: '20px', cursor: 'pointer',
+                          fontFamily: "'Exo 2', sans-serif", fontSize: '0.8rem',
+                          background: isActive ? 'rgba(155,61,184,0.35)' : 'rgba(255,255,255,0.05)',
+                          border: isActive ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
+                          color: 'var(--text-primary)', transition: 'all 0.15s',
+                        }}
+                      >
+                        {emoji} {tag}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )
+        })}
+
+        {/* Active filter chips */}
+        {activeTags.size > 0 && (
           <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
-            gap: '0.5rem', marginTop: '0.75rem',
+            display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
+            marginTop: '0.75rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.75rem',
           }}>
-            {categoryNames.map(cat => (
-              <div key={cat} onClick={() => toggleCategory(cat)} style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                padding: '0.5rem 0.25rem', borderRadius: '8px', cursor: 'pointer',
-                background: selectedCategories.includes(cat)
-                  ? 'rgba(117,7,135,0.4)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${selectedCategories.includes(cat) ? 'rgba(117,7,135,0.8)' : 'var(--border-glass)'}`,
-                transition: 'all 0.15s',
-                userSelect: 'none',
-              }}>
-                <span style={{ fontSize: '1.3rem' }}>{EVENT_CATEGORIES[cat]}</span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.2rem', lineHeight: 1.2 }}>{cat}</span>
-              </div>
+            {Array.from(activeTags).map(tag => (
+              <span
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                style={{
+                  padding: '0.25rem 0.75rem', borderRadius: '20px', cursor: 'pointer',
+                  fontFamily: "'Exo 2', sans-serif", fontSize: '0.8rem',
+                  background: 'rgba(155,61,184,0.35)', border: '1px solid var(--pride-violet)',
+                  color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.35rem',
+                  userSelect: 'none',
+                }}
+              >
+                {tag} <span style={{ opacity: 0.7 }}>✕</span>
+              </span>
             ))}
           </div>
         )}
-
-        {/* Space Type sub-section */}
-        <button onClick={() => setShowSpaceTypeGrid(v => !v)} style={{
-          background: 'none', border: 'none', color: 'var(--text-secondary)',
-          cursor: 'pointer', fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
-          padding: '0.25rem 0', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
-        }}>
-          {showSpaceTypeGrid ? '▼' : '▶'} Filter by Space Type
-          {selectedSpaceTypes.length > 0 && (
-            <span style={{ color: 'var(--pride-yellow)', fontSize: '0.75rem' }}>
-              ({selectedSpaceTypes.length} active)
-            </span>
-          )}
-        </button>
-
-        {showSpaceTypeGrid && (
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
-            gap: '0.5rem', marginTop: '0.75rem',
-          }}>
-            {(Object.keys(SPACE_TYPES) as SpaceType[]).map(vt => (
-              <div key={vt} onClick={() => toggleSpaceType(vt)} style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                padding: '0.5rem 0.25rem', borderRadius: '8px', cursor: 'pointer',
-                background: selectedSpaceTypes.includes(vt)
-                  ? 'rgba(117,7,135,0.4)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${selectedSpaceTypes.includes(vt) ? 'rgba(117,7,135,0.8)' : 'var(--border-glass)'}`,
-                transition: 'all 0.15s',
-                userSelect: 'none',
-              }}>
-                <span style={{ fontSize: '1.3rem' }}>{SPACE_TYPES[vt]}</span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.2rem', lineHeight: 1.2 }}>{vt}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Age Restriction sub-section */}
-        <div style={{
-          color: 'var(--text-secondary)',
-          fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
-          padding: '0.25rem 0', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
-        }}>
-          Filter by Age
-          {ageFilter && (
-            <span style={{ color: 'var(--pride-yellow)', fontSize: '0.75rem' }}>
-              (1 active)
-            </span>
-          )}
-        </div>
-        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
-          {([{ label: 'All Ages', emoji: '🌈' }, { label: '18+', emoji: '🔞' }, { label: '21+', emoji: '🍺' }] as const).map(opt => (
-            <button key={opt.label} onClick={() => setAgeFilter(prev => prev === opt.label ? '' : opt.label)} style={{
-              padding: '0.4rem 1.25rem', borderRadius: '20px', cursor: 'pointer',
-              fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
-              background: ageFilter === opt.label ? 'rgba(115,41,130,0.5)' : 'rgba(255,255,255,0.05)',
-              border: ageFilter === opt.label ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
-              color: 'var(--text-primary)',
-              transition: 'all 0.15s',
-            }}>
-              {opt.emoji} {opt.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* View toggle */}
@@ -450,16 +413,24 @@ export default function HomePage() {
                               📍 {event.venue}
                             </div>
                           )}
-                          <div style={{ marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1rem' }}>{EVENT_CATEGORIES[event.category] || '📅'}</span>
-                            <span style={{
-                              fontSize: '0.65rem', padding: '0.1rem 0.5rem', borderRadius: '10px',
-                              background: 'rgba(117,7,135,0.3)', color: 'var(--text-secondary)',
-                              fontFamily: "'Exo 2', sans-serif",
-                            }}>
-                              {event.category}
-                            </span>
-                          </div>
+                          {event.tags && event.tags.length > 0 && (
+                            <div style={{ marginTop: '0.35rem', display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                              {event.tags.map(tag => {
+                                const isActive = activeTags.has(tag)
+                                return (
+                                  <span key={tag} style={{
+                                    fontSize: '0.65rem', padding: '0.1rem 0.5rem', borderRadius: '10px',
+                                    background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
+                                    border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
+                                    color: 'var(--text-secondary)',
+                                    fontFamily: "'Exo 2', sans-serif",
+                                  }}>
+                                    {tag}
+                                  </span>
+                                )
+                              })}
+                            </div>
+                          )}
                         </div>
                       </Link>
                     ))}
@@ -506,8 +477,25 @@ export default function HomePage() {
                       {event.venue && (
                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>📍 {event.venue}</div>
                       )}
+                      {event.tags && event.tags.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.25rem' }}>
+                          {event.tags.map(tag => {
+                            const isActive = activeTags.has(tag)
+                            return (
+                              <span key={tag} style={{
+                                fontSize: '0.62rem', padding: '0.1rem 0.4rem', borderRadius: '8px',
+                                background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
+                                border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
+                                color: 'var(--text-secondary)',
+                                fontFamily: "'Exo 2', sans-serif",
+                              }}>
+                                {tag}
+                              </span>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
-                    <div style={{ fontSize: '1.2rem' }}>{EVENT_CATEGORIES[event.category] || '📅'}</div>
                   </Link>
                 )
               })}
@@ -519,7 +507,7 @@ export default function HomePage() {
             <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
               <p style={{ fontSize: '2rem' }}>📅</p>
               <p>No events match your filters.</p>
-              <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Try adjusting your location, date, or category filters.</p>
+              <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Try adjusting your search, date, or tag filters.</p>
             </div>
           )}
         </>
