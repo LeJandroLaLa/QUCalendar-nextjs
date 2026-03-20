@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { QUEvent, EVENT_TAGS } from '@/lib/types'
+import { QUEvent, EVENT_TAGS, AGE_FILTERS, IDENTITY_FILTERS } from '@/lib/types'
 import Link from 'next/link'
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
@@ -85,6 +85,28 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
 }
 
+const pillStyle: React.CSSProperties = {
+  padding: '0.35rem 0.75rem',
+  borderRadius: '20px',
+  cursor: 'pointer',
+  fontFamily: "'Exo 2', sans-serif",
+  fontSize: '0.8rem',
+  border: '1px solid var(--border-glass)',
+  background: 'rgba(255,255,255,0.05)',
+  color: 'var(--text-primary)',
+  transition: 'all 0.15s',
+  whiteSpace: 'nowrap' as const,
+}
+
+// Simple static tags shown inline in Row 1 (no dropdown)
+const SIMPLE_TAGS = [
+  { tag: 'Giving Back', emoji: '🩷' },
+  { tag: 'Bar / Club', emoji: '🍺' },
+  { tag: 'Brunch', emoji: '🍽️' },
+  { tag: 'Outdoor', emoji: '🌳' },
+  { tag: 'Venue', emoji: '🏛️' },
+]
+
 export default function HomePage() {
   const [events, setEvents] = useState<QUEvent[]>([])
   const [loading, setLoading] = useState(true)
@@ -93,9 +115,9 @@ export default function HomePage() {
   const [keyword, setKeyword] = useState('')
   const [dateFilter, setDateFilter] = useState('')
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(Object.keys(EVENT_TAGS))
-  )
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+
+  const filterBarRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -116,34 +138,54 @@ export default function HomePage() {
     fetchAll()
   }, [])
 
-  const setToday = () => setDateFilter(formatDateMDY(new Date()))
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterBarRef.current && !filterBarRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
+  const setToday = () => setDateFilter(formatDateMDY(new Date()))
   const setWeekend = () => setDateFilter('weekend')
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setLocationQuery('')
     setKeyword('')
     setDateFilter('')
     setActiveTags(new Set())
-  }
+    setOpenDropdown(null)
+  }, [])
 
-  const toggleTag = (tag: string) => {
+  const toggleTag = useCallback((tag: string) => {
     setActiveTags(prev => {
       const next = new Set(prev)
       if (next.has(tag)) next.delete(tag)
       else next.add(tag)
       return next
     })
-  }
+  }, [])
 
-  const toggleSection = (key: string) => {
-    setExpandedSections(prev => {
+  const removeTagWithSubtags = useCallback((tagToRemove: string) => {
+    setActiveTags(prev => {
       const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
+      next.delete(tagToRemove)
+      // If this is a group label tag, also remove all sub-tags
+      for (const group of Object.values(EVENT_TAGS)) {
+        if (group.label === tagToRemove) {
+          for (const sub of group.tags) next.delete(sub.tag)
+        }
+      }
       return next
     })
-  }
+  }, [])
+
+  const toggleDropdown = useCallback((key: string) => {
+    setOpenDropdown(prev => prev === key ? null : key)
+  }, [])
 
   const filteredEvents = useMemo(() => {
     let evts = [...events]
@@ -174,13 +216,15 @@ export default function HomePage() {
 
     if (activeTags.size > 0) {
       evts = evts.filter(e => {
-        const eventTags = e.tags || []
-        return Array.from(activeTags).every(tag => eventTags.includes(tag))
+        for (const tag of activeTags) {
+          if (!e.tags?.includes(tag)) return false
+        }
+        return true
       })
     }
 
     return evts
-  }, [events, locationQuery, keyword, dateFilter, activeTags])
+  }, [events, keyword, locationQuery, dateFilter, activeTags])
 
   const dayGroups = useMemo(() => groupByDay(filteredEvents), [filteredEvents])
 
@@ -208,7 +252,7 @@ export default function HomePage() {
       </div>
 
       {/* Filter bar */}
-      <div className="glass-card" style={{ padding: '1rem', marginBottom: '1rem' }}>
+      <div className="glass-card" style={{ padding: '1rem', marginBottom: '1rem' }} ref={filterBarRef}>
         {/* Search row */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
           <input type="text" placeholder="Search all events..." value={keyword}
@@ -242,75 +286,203 @@ export default function HomePage() {
           }}>Clear</button>
         </div>
 
-        {/* Tag group sections */}
-        {(Object.entries(EVENT_TAGS) as [string, { label: string; tags: readonly { tag: string; emoji: string }[] }][]).map(([key, group]) => {
-          const activeInGroup = group.tags.filter(t => activeTags.has(t.tag)).length
-          const isExpanded = expandedSections.has(key)
-          return (
-            <div key={key} style={{ marginTop: '0.75rem' }}>
-              <button
-                onClick={() => toggleSection(key)}
-                style={{
-                  background: 'none', border: 'none', color: 'var(--text-secondary)',
-                  cursor: 'pointer', fontFamily: "'Orbitron', sans-serif", fontSize: '0.72rem',
-                  padding: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem',
-                  fontVariant: 'small-caps', letterSpacing: '0.05em',
-                }}
-              >
-                {isExpanded ? '▼' : '▶'} {group.label}
-                {activeInGroup > 0 && (
-                  <span style={{
-                    background: 'rgba(155,61,184,0.35)',
-                    border: '1px solid var(--pride-violet)',
-                    borderRadius: '20px', padding: '0 0.5rem',
-                    fontSize: '0.68rem', color: 'var(--text-primary)',
+        {/* Row 1 — Primary tag dropdowns + simple pills */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+          {(Object.entries(EVENT_TAGS) as [keyof typeof EVENT_TAGS, typeof EVENT_TAGS[keyof typeof EVENT_TAGS]][]).map(([key, group]) => {
+            const isOpen = openDropdown === key
+            const activeInGroup = group.tags.filter(t => activeTags.has(t.tag)).length
+            const groupActive = activeInGroup > 0
+
+            return (
+              <div key={key} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => toggleDropdown(key)}
+                  style={{
+                    ...pillStyle,
+                    background: groupActive ? 'rgba(155,61,184,0.35)' : 'rgba(255,255,255,0.05)',
+                    border: groupActive ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
+                    display: 'flex', alignItems: 'center', gap: '0.3rem',
+                  }}
+                >
+                  {group.emoji} {group.label}
+                  {activeInGroup > 0 && (
+                    <span style={{
+                      background: 'rgba(155,61,184,0.5)',
+                      borderRadius: '10px',
+                      padding: '0 0.4rem',
+                      fontSize: '0.68rem',
+                    }}>{activeInGroup}</span>
+                  )}
+                  <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>▼</span>
+                </button>
+
+                {isOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    left: 0,
+                    background: '#2a2a2a',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: '12px',
+                    padding: '0.75rem',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.4rem',
+                    zIndex: 200,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+                    minWidth: '180px',
                   }}>
-                    {activeInGroup}
-                  </span>
+                    {group.tags.map(({ tag, emoji }) => {
+                      const isActive = activeTags.has(tag)
+                      return (
+                        <button
+                          key={tag}
+                          onClick={() => toggleTag(tag)}
+                          style={{
+                            padding: '0.3rem 0.8rem',
+                            borderRadius: '20px',
+                            cursor: 'pointer',
+                            fontFamily: "'Exo 2', sans-serif",
+                            fontSize: '0.75rem',
+                            background: isActive ? 'rgba(77,121,255,0.28)' : 'rgba(255,255,255,0.07)',
+                            border: isActive ? '1px solid var(--pride-blue)' : '1px solid var(--border-glass)',
+                            color: 'var(--text-primary)',
+                            transition: 'all 0.15s',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {emoji} {tag}
+                        </button>
+                      )
+                    })}
+                  </div>
                 )}
-              </button>
+              </div>
+            )
+          })}
 
-              {isExpanded && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  {group.tags.map(({ tag, emoji }) => {
-                    const isActive = activeTags.has(tag)
-                    return (
-                      <button
-                        key={tag}
-                        onClick={() => toggleTag(tag)}
-                        style={{
-                          padding: '0.35rem 0.75rem', borderRadius: '20px', cursor: 'pointer',
-                          fontFamily: "'Exo 2', sans-serif", fontSize: '0.8rem',
-                          background: isActive ? 'rgba(155,61,184,0.35)' : 'rgba(255,255,255,0.05)',
-                          border: isActive ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
-                          color: 'var(--text-primary)', transition: 'all 0.15s',
-                        }}
-                      >
-                        {emoji} {tag}
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          )
-        })}
+          {/* Divider */}
+          <div style={{ width: '1px', height: '24px', background: 'var(--border-glass)', flexShrink: 0 }} />
 
-        {/* Active filter chips */}
-        {activeTags.size > 0 && (
-          <div style={{
-            display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
-            marginTop: '0.75rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.75rem',
-          }}>
-            {Array.from(activeTags).map(tag => (
-              <span
+          {/* Simple static pills */}
+          {SIMPLE_TAGS.map(({ tag, emoji }) => {
+            const isActive = activeTags.has(tag)
+            return (
+              <button
                 key={tag}
                 onClick={() => toggleTag(tag)}
                 style={{
-                  padding: '0.25rem 0.75rem', borderRadius: '20px', cursor: 'pointer',
-                  fontFamily: "'Exo 2', sans-serif", fontSize: '0.8rem',
-                  background: 'rgba(155,61,184,0.35)', border: '1px solid var(--pride-violet)',
-                  color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.35rem',
+                  ...pillStyle,
+                  background: isActive ? 'rgba(155,61,184,0.35)' : 'rgba(255,255,255,0.05)',
+                  border: isActive ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
+                }}
+              >
+                {emoji} {tag}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Row 2 — Age + Identity filters */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+          {/* AGE label */}
+          <span style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '0.65rem',
+            fontVariant: 'small-caps',
+            color: 'var(--text-secondary)',
+            letterSpacing: '0.06em',
+            whiteSpace: 'nowrap',
+          }}>AGE</span>
+
+          {AGE_FILTERS.map(age => {
+            const isActive = activeTags.has(age)
+            return (
+              <button
+                key={age}
+                onClick={() => toggleTag(age)}
+                style={{
+                  ...pillStyle,
+                  fontSize: '0.75rem',
+                  padding: '0.25rem 0.65rem',
+                  background: isActive ? 'rgba(255,59,59,0.25)' : 'rgba(255,255,255,0.05)',
+                  border: isActive ? '1px solid var(--pride-red)' : '1px solid var(--border-glass)',
+                }}
+              >
+                {age}
+              </button>
+            )
+          })}
+
+          {/* Divider */}
+          <div style={{ width: '1px', height: '24px', background: 'var(--border-glass)', flexShrink: 0 }} />
+
+          {/* IDENTITY label */}
+          <span style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '0.65rem',
+            fontVariant: 'small-caps',
+            color: 'var(--text-secondary)',
+            letterSpacing: '0.06em',
+            whiteSpace: 'nowrap',
+          }}>IDENTITY</span>
+
+          {IDENTITY_FILTERS.map(({ tag, emoji }) => {
+            const isActive = activeTags.has(tag)
+            return (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                style={{
+                  ...pillStyle,
+                  fontSize: '0.75rem',
+                  padding: '0.25rem 0.65rem',
+                  background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
+                  border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
+                }}
+              >
+                {emoji} {tag}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Active chips row */}
+        {activeTags.size > 0 && (
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            alignItems: 'center',
+            marginTop: '0.75rem',
+            borderTop: '1px solid var(--border-glass)',
+            paddingTop: '0.75rem',
+          }}>
+            <span style={{
+              fontFamily: "'Orbitron', sans-serif",
+              fontSize: '0.65rem',
+              fontVariant: 'small-caps',
+              color: 'var(--text-secondary)',
+              letterSpacing: '0.06em',
+              whiteSpace: 'nowrap',
+            }}>FILTERING:</span>
+
+            {Array.from(activeTags).map(tag => (
+              <span
+                key={tag}
+                onClick={() => removeTagWithSubtags(tag)}
+                style={{
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontFamily: "'Exo 2', sans-serif",
+                  fontSize: '0.8rem',
+                  background: 'rgba(155,61,184,0.35)',
+                  border: '1px solid var(--pride-violet)',
+                  color: 'var(--text-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
                   userSelect: 'none',
                 }}
               >

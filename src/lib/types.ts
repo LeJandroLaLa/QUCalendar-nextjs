@@ -241,81 +241,73 @@ export const EVENT_CATEGORIES: Record<string, string> = {
 export const EVENT_TAGS = {
   performance: {
     label: 'Performance',
+    emoji: '🎭',
     tags: [
-      { tag: 'Drag', emoji: '🎭' },
+      { tag: 'Drag', emoji: '👑' },
       { tag: 'Burlesque', emoji: '💋' },
-      { tag: 'Live Music', emoji: '🎵' },
-      { tag: 'Live DJ', emoji: '🎛️' },
-      { tag: 'Open Mic', emoji: '🎤' },
-      { tag: 'Theater', emoji: '🎪' },
       { tag: 'Comedy', emoji: '😂' },
+      { tag: 'Pageant', emoji: '👠' },
+      { tag: 'Theater', emoji: '🎪' },
       { tag: 'Poetry', emoji: '📝' },
-      { tag: 'Dance', emoji: '💃' },
+      { tag: 'Open Mic', emoji: '🎤' },
     ]
   },
-  vibe: {
-    label: 'Vibe',
+  liveMusic: {
+    label: 'Live Music',
+    emoji: '🎵',
     tags: [
-      { tag: 'Nightlife', emoji: '🌙' },
+      { tag: 'Singer-Songwriter', emoji: '🎸' },
+      { tag: 'Band', emoji: '🎶' },
+      { tag: 'Jazz', emoji: '🎺' },
+      { tag: 'Folk', emoji: '🪕' },
+      { tag: 'Electronic', emoji: '🔊' },
+    ]
+  },
+  danceNight: {
+    label: 'Dance Night',
+    emoji: '🎛️',
+    tags: [
+      { tag: 'Live DJ', emoji: '🎛️' },
+      { tag: 'House', emoji: '🏠' },
+      { tag: 'Techno', emoji: '⚡' },
+      { tag: 'Underground', emoji: '🔦' },
       { tag: 'Late Night', emoji: '🌃' },
-      { tag: 'All Ages', emoji: '🌈' },
-      { tag: 'Sober Friendly', emoji: '💧' },
-      { tag: 'Chill', emoji: '✨' },
-      { tag: 'Underground', emoji: '⚡' },
-    ]
-  },
-  spaceType: {
-    label: 'Space Type',
-    tags: [
-      { tag: 'Bar', emoji: '🍺' },
-      { tag: 'Club', emoji: '🌟' },
-      { tag: 'Restaurant', emoji: '🍽️' },
-      { tag: 'Brunch', emoji: '🥞' },
-      { tag: 'Outdoor', emoji: '🌳' },
-      { tag: 'Pop-Up', emoji: '🎪' },
     ]
   },
   community: {
     label: 'Community',
+    emoji: '🤝',
     tags: [
       { tag: 'Pride', emoji: '🏳️‍🌈' },
-      { tag: 'Fundraiser', emoji: '🩷' },
-      { tag: 'Workshop', emoji: '📚' },
       { tag: 'Support Group', emoji: '🤝' },
+      { tag: 'Workshop', emoji: '📚' },
       { tag: 'Social', emoji: '☕' },
-      { tag: 'Giving Back', emoji: '💝' },
       { tag: 'Activism', emoji: '✊' },
     ]
   },
-  identity: {
-    label: 'Identity & Community',
-    tags: [
-      { tag: 'Trans Community', emoji: '⚧️' },
-      { tag: 'Global Majority', emoji: '🌍' },
-      { tag: 'Indigenous', emoji: '🌱' },
-      { tag: 'Leather & Kink', emoji: '🔗' },
-      { tag: 'Bears', emoji: '🐻' },
-      { tag: 'Femme', emoji: '👄' },
-    ]
-  },
-  artCulture: {
-    label: 'Art & Culture',
+  artsCulture: {
+    label: 'Arts & Culture',
+    emoji: '🎨',
     tags: [
       { tag: 'Art Show', emoji: '🎨' },
       { tag: 'Film', emoji: '🎬' },
-      { tag: 'Gaming', emoji: '🎮' },
       { tag: 'Fashion', emoji: '👗' },
       { tag: 'Market', emoji: '🛍️' },
-    ]
-  },
-  age: {
-    label: 'Age',
-    tags: [
-      { tag: 'All Ages', emoji: '🌈' },
-      { tag: '18+', emoji: '🔞' },
-      { tag: '21+', emoji: '🍺' },
+      { tag: 'Gaming', emoji: '🎮' },
     ]
   },
 } as const
+
+export const AGE_FILTERS = ['All Ages', '18+', '21+'] as const
+
+export const IDENTITY_FILTERS = [
+  { tag: 'Trans Community', emoji: '⚧️' },
+  { tag: 'Global Majority', emoji: '🌍' },
+  { tag: 'Indigenous', emoji: '🌱' },
+  { tag: 'Sober Friendly', emoji: '💧' },
+  { tag: 'Bears', emoji: '🐻' },
+  { tag: 'Femme', emoji: '👄' },
+  { tag: 'Leather & Kink', emoji: '🔗' },
+] as const
 
 export type EventTag = string
