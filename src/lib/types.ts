@@ -264,7 +264,7 @@ export const EVENT_TAGS = {
     ]
   },
   danceNight: {
-    label: 'Dance Night',
+    label: 'Dancing',
     emoji: '🎛️',
     tags: [
       { tag: 'Live DJ', emoji: '🎛️' },
