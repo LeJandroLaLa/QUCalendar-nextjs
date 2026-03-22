@@ -239,39 +239,45 @@ export const EVENT_CATEGORIES: Record<string, string> = {
 // EVENT TAGS
 // ─────────────────────────────────────────
 export const EVENT_TAGS = {
-  performance: {
-    label: 'Performance',
+  liveShow: {
+    label: 'Live Show',
     emoji: '🎭',
     tags: [
-      { tag: 'Drag', emoji: '👑' },
+      { tag: 'Drag', emoji: '🎭' },
       { tag: 'Burlesque', emoji: '💋' },
       { tag: 'Comedy', emoji: '😂' },
       { tag: 'Pageant', emoji: '👠' },
       { tag: 'Theater', emoji: '🎪' },
       { tag: 'Poetry', emoji: '📝' },
-      { tag: 'Open Mic', emoji: '🎤' },
+      { tag: 'Hosting', emoji: '🎤' },
+      { tag: 'Brunch', emoji: '🍳' },
     ]
   },
-  liveMusic: {
-    label: 'Live Music',
+  music: {
+    label: 'Music',
     emoji: '🎵',
     tags: [
       { tag: 'Singer-Songwriter', emoji: '🎸' },
       { tag: 'Band', emoji: '🎶' },
       { tag: 'Jazz', emoji: '🎺' },
+      { tag: 'Blues', emoji: '🎸' },
       { tag: 'Folk', emoji: '🪕' },
+      { tag: 'Classical', emoji: '🎻' },
       { tag: 'Electronic', emoji: '🔊' },
+      { tag: 'Hip-Hop', emoji: '🎧' },
+      { tag: 'R&B', emoji: '🎙️' },
     ]
   },
-  danceNight: {
+  dancing: {
     label: 'Dancing',
-    emoji: '🎛️',
+    emoji: '💃',
     tags: [
-      { tag: 'Live DJ', emoji: '🎛️' },
+      { tag: 'DJ', emoji: '🎛️' },
       { tag: 'House', emoji: '🏠' },
       { tag: 'Techno', emoji: '⚡' },
       { tag: 'Underground', emoji: '🔦' },
-      { tag: 'Late Night', emoji: '🌃' },
+      { tag: 'Ballroom', emoji: '💫' },
+      { tag: 'Late-Night', emoji: '🌃' },
     ]
   },
   community: {
@@ -279,35 +285,48 @@ export const EVENT_TAGS = {
     emoji: '🤝',
     tags: [
       { tag: 'Pride', emoji: '🏳️‍🌈' },
-      { tag: 'Support Group', emoji: '🤝' },
       { tag: 'Workshop', emoji: '📚' },
-      { tag: 'Social', emoji: '☕' },
+      { tag: 'Support', emoji: '🤝' },
       { tag: 'Activism', emoji: '✊' },
+      { tag: 'Fundraiser', emoji: '🩷' },
+      { tag: 'Networking', emoji: '🌐' },
+      { tag: 'Social', emoji: '☕' },
     ]
   },
-  artsCulture: {
-    label: 'Arts & Culture',
+  arts: {
+    label: 'Arts',
     emoji: '🎨',
     tags: [
-      { tag: 'Art Show', emoji: '🎨' },
+      { tag: 'Gallery', emoji: '🖼️' },
       { tag: 'Film', emoji: '🎬' },
       { tag: 'Fashion', emoji: '👗' },
       { tag: 'Market', emoji: '🛍️' },
       { tag: 'Gaming', emoji: '🎮' },
+      { tag: 'Spoken-Word', emoji: '🗣️' },
     ]
   },
 } as const
 
+export const SPACE_TYPE_FILTERS = [
+  { tag: 'Bar', emoji: '🍺' },
+  { tag: 'Club', emoji: '🌟' },
+  { tag: 'Restaurant', emoji: '🍽️' },
+  { tag: 'Outdoor', emoji: '🌳' },
+  { tag: 'Theater', emoji: '🎭' },
+  { tag: 'Community-Center', emoji: '🏛️' },
+  { tag: 'Pop-Up', emoji: '🎪' },
+] as const
+
 export const AGE_FILTERS = ['All Ages', '18+', '21+'] as const
 
 export const IDENTITY_FILTERS = [
-  { tag: 'Trans Community', emoji: '⚧️' },
-  { tag: 'Global Majority', emoji: '🌍' },
+  { tag: 'Trans', emoji: '⚧️' },
+  { tag: 'Global-Majority', emoji: '🌍' },
   { tag: 'Indigenous', emoji: '🌱' },
-  { tag: 'Sober Friendly', emoji: '💧' },
+  { tag: 'Sober', emoji: '💧' },
   { tag: 'Bears', emoji: '🐻' },
   { tag: 'Femme', emoji: '👄' },
-  { tag: 'Leather & Kink', emoji: '🔗' },
+  { tag: 'Leather', emoji: '🔗' },
 ] as const
 
 export type EventTag = string

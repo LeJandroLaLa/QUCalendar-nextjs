@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { QUEvent, EVENT_TAGS, AGE_FILTERS, IDENTITY_FILTERS } from '@/lib/types'
+import { QUEvent, EVENT_TAGS, SPACE_TYPE_FILTERS, AGE_FILTERS, IDENTITY_FILTERS } from '@/lib/types'
 import Link from 'next/link'
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
@@ -98,14 +98,6 @@ const pillStyle: React.CSSProperties = {
   whiteSpace: 'nowrap' as const,
 }
 
-// Simple static tags shown inline in Row 1 (no dropdown)
-const SIMPLE_TAGS = [
-  { tag: 'Giving Back', emoji: '🩷' },
-  { tag: 'Bar / Club', emoji: '🍺' },
-  { tag: 'Brunch', emoji: '🍽️' },
-  { tag: 'Outdoor', emoji: '🌳' },
-  { tag: 'Venue', emoji: '🏛️' },
-]
 
 export default function HomePage() {
   const [events, setEvents] = useState<QUEvent[]>([])
@@ -286,7 +278,7 @@ export default function HomePage() {
           }}>Clear</button>
         </div>
 
-        {/* Row 1 — Primary tag dropdowns + simple pills */}
+        {/* Row 1 — Event Type dropdowns + Giving Back */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
           {(Object.entries(EVENT_TAGS) as [keyof typeof EVENT_TAGS, typeof EVENT_TAGS[keyof typeof EVENT_TAGS]][]).map(([key, group]) => {
             const isOpen = openDropdown === key
@@ -330,7 +322,7 @@ export default function HomePage() {
                     gap: '0.4rem',
                     zIndex: 200,
                     boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-                    minWidth: '180px',
+                    minWidth: '280px',
                   }}>
                     {group.tags.map(({ tag, emoji }) => {
                       const isActive = activeTags.has(tag)
@@ -364,8 +356,36 @@ export default function HomePage() {
           {/* Divider */}
           <div style={{ width: '1px', height: '24px', background: 'var(--border-glass)', flexShrink: 0 }} />
 
-          {/* Simple static pills */}
-          {SIMPLE_TAGS.map(({ tag, emoji }) => {
+          {/* Giving Back simple pill */}
+          {(() => {
+            const isActive = activeTags.has('Giving-Back')
+            return (
+              <button
+                onClick={() => toggleTag('Giving-Back')}
+                style={{
+                  ...pillStyle,
+                  background: isActive ? 'rgba(155,61,184,0.35)' : 'rgba(255,255,255,0.05)',
+                  border: isActive ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
+                }}
+              >
+                🩷 Giving Back
+              </button>
+            )
+          })()}
+        </div>
+
+        {/* Row 2 — Space Type */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
+          <span style={{
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '0.6rem',
+            letterSpacing: '2px',
+            opacity: 0.55,
+            fontVariant: 'small-caps',
+            whiteSpace: 'nowrap',
+          }}>SPACE</span>
+
+          {SPACE_TYPE_FILTERS.map(({ tag, emoji }) => {
             const isActive = activeTags.has(tag)
             return (
               <button
@@ -373,8 +393,10 @@ export default function HomePage() {
                 onClick={() => toggleTag(tag)}
                 style={{
                   ...pillStyle,
-                  background: isActive ? 'rgba(155,61,184,0.35)' : 'rgba(255,255,255,0.05)',
-                  border: isActive ? '1px solid var(--pride-violet)' : '1px solid var(--border-glass)',
+                  fontSize: '0.75rem',
+                  padding: '0.25rem 0.65rem',
+                  background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
+                  border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
                 }}
               >
                 {emoji} {tag}
@@ -383,15 +405,14 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* Row 2 — Age + Identity filters */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-          {/* AGE label */}
+        {/* Row 3 — Age & Identity */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.65rem',
+            fontSize: '0.6rem',
+            letterSpacing: '2px',
+            opacity: 0.55,
             fontVariant: 'small-caps',
-            color: 'var(--text-secondary)',
-            letterSpacing: '0.06em',
             whiteSpace: 'nowrap',
           }}>AGE</span>
 
@@ -417,13 +438,12 @@ export default function HomePage() {
           {/* Divider */}
           <div style={{ width: '1px', height: '24px', background: 'var(--border-glass)', flexShrink: 0 }} />
 
-          {/* IDENTITY label */}
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.65rem',
+            fontSize: '0.6rem',
+            letterSpacing: '2px',
+            opacity: 0.55,
             fontVariant: 'small-caps',
-            color: 'var(--text-secondary)',
-            letterSpacing: '0.06em',
             whiteSpace: 'nowrap',
           }}>IDENTITY</span>
 
@@ -447,23 +467,23 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* Active chips row */}
+        {/* Row 4 — Active chips */}
         {activeTags.size > 0 && (
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',
             gap: '0.5rem',
             alignItems: 'center',
-            marginTop: '0.75rem',
+            marginTop: '0.5rem',
             borderTop: '1px solid var(--border-glass)',
             paddingTop: '0.75rem',
           }}>
             <span style={{
               fontFamily: "'Orbitron', sans-serif",
-              fontSize: '0.65rem',
+              fontSize: '0.6rem',
+              letterSpacing: '2px',
+              opacity: 0.55,
               fontVariant: 'small-caps',
-              color: 'var(--text-secondary)',
-              letterSpacing: '0.06em',
               whiteSpace: 'nowrap',
             }}>FILTERING:</span>
 
