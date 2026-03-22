@@ -330,3 +330,48 @@ export const IDENTITY_FILTERS = [
 ] as const
 
 export type EventTag = string
+
+// ─────────────────────────────────────────
+// ARTISTS (PUBLIC / PRIVATE SPLIT)
+// ─────────────────────────────────────────
+export interface PublicArtist {
+  id: string
+  displayName: string
+  businessName?: string
+  useBusinessName: boolean
+  bio?: string
+  imageUrl?: string
+  socialLinks?: Record<string, string>
+  city?: string
+  status?: 'invited' | 'pending' | 'approved' | 'rejected'
+}
+
+export interface PrivateArtistData {
+  legalName?: string
+  email?: string
+  phone?: string
+  paymentInfo?: string
+  notes?: string
+}
+
+// ─────────────────────────────────────────
+// ROSTER
+// ─────────────────────────────────────────
+export type RosterParticipantType = 'performer' | 'merchant' | 'presenter'
+
+export interface RosterEntry {
+  id: string
+  participantId: string
+  participantType: RosterParticipantType
+  displayName: string
+  imageUrl?: string
+  order: number
+  confirmedAt?: Timestamp
+  addedBy?: string
+}
+
+export const ROSTER_SECTION_LABELS: Record<RosterParticipantType, string> = {
+  performer: 'Live Performances',
+  merchant: 'Artist Market',
+  presenter: 'Featured Presenters',
+}

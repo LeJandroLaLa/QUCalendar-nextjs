@@ -23,5 +23,13 @@ service cloud.firestore {
       allow create: if request.auth != null;
       allow update, delete: if request.auth.token.email == 'jandro44@gmail.com';
     }
+    match /artists/{artistId}/private/{document} {
+      allow read, write: if request.auth.uid == artistId
+                         || request.auth.token.email == 'jandro44@gmail.com';
+    }
+    match /events/{eventId}/roster/{rosterId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
   }
 }

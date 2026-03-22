@@ -5,6 +5,7 @@ import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/
 import { db } from '@/lib/firebase'
 import { QUEvent, EVENT_CATEGORIES } from '@/lib/types'
 import EventCard from '@/components/EventCard'
+import EventRoster from '@/components/EventRoster'
 import Link from 'next/link'
 
 export default function EventDetail({ id }: { id: string }) {
@@ -361,6 +362,9 @@ export default function EventDetail({ id }: { id: string }) {
           )}
         </div>
       </div>
+
+      {/* Who's There — Roster (heading rendered inside EventRoster only when entries exist) */}
+      <EventRoster eventId={id} />
 
       {/* Related Events section */}
       {related.length > 0 && (
