@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation'
 import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
-import { EVENT_CATEGORIES, Space, Artist } from '@/lib/types'
+import { EVENT_CATEGORIES, EventCategory, Space, Artist } from '@/lib/types'
 import ImageUpload from '@/components/ImageUpload'
 
-const categoryNames = Object.keys(EVENT_CATEGORIES)
+const categoryEntries = Object.entries(EVENT_CATEGORIES) as Array<[EventCategory, string]>
 
 export default function SubmitEventPage() {
   const { user, loading: authLoading } = useAuth()
@@ -182,8 +182,8 @@ export default function SubmitEventPage() {
           <label style={labelStyle}>Category *</label>
           <select value={form.category} onChange={(e) => updateField('category', e.target.value)} required style={{ ...inputStyle, cursor: 'pointer' }}>
             <option value="">Select category...</option>
-            {categoryNames.map((cat) => (
-              <option key={cat} value={cat}>{EVENT_CATEGORIES[cat]} {cat}</option>
+            {categoryEntries.map(([cat, emoji]) => (
+              <option key={cat} value={cat}>{emoji} {cat}</option>
             ))}
           </select>
         </div>

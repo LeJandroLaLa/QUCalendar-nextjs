@@ -208,8 +208,9 @@ export default function HomePage() {
 
     if (activeTags.size > 0) {
       evts = evts.filter(e => {
+        const eventIdentitySet = new Set<string>(e.identityTags ?? [])
         for (const tag of activeTags) {
-          if (!e.tags?.includes(tag)) return false
+          if (!eventIdentitySet.has(tag)) return false
         }
         return true
       })
@@ -605,9 +606,9 @@ export default function HomePage() {
                               📍 {event.venue}
                             </div>
                           )}
-                          {event.tags && event.tags.length > 0 && (
+                          {event.identityTags && event.identityTags.length > 0 && (
                             <div style={{ marginTop: '0.35rem', display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                              {event.tags.map(tag => {
+                              {event.identityTags.map(tag => {
                                 const isActive = activeTags.has(tag)
                                 return (
                                   <span key={tag} style={{
@@ -669,9 +670,9 @@ export default function HomePage() {
                       {event.venue && (
                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>📍 {event.venue}</div>
                       )}
-                      {event.tags && event.tags.length > 0 && (
+                      {event.identityTags && event.identityTags.length > 0 && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.25rem' }}>
-                          {event.tags.map(tag => {
+                          {event.identityTags.map(tag => {
                             const isActive = activeTags.has(tag)
                             return (
                               <span key={tag} style={{

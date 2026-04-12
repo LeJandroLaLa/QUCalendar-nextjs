@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { EVENT_CATEGORIES } from '@/lib/types'
+import { EVENT_CATEGORIES, EventCategory } from '@/lib/types'
 
 type Tab = 'spaces' | 'artists' | 'events'
 
@@ -11,7 +11,7 @@ interface ApprovedItem {
   id: string
   name: string
   type?: string
-  category?: string
+  category?: EventCategory
   date?: string
   imageUrl?: string
 }
@@ -116,7 +116,7 @@ export default function ApprovedContentPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {items.map((item) => {
-            const emoji = item.category ? (EVENT_CATEGORIES[item.category] || '') : ''
+            const emoji = item.category != null ? EVENT_CATEGORIES[item.category] : ''
 
             return (
               <div key={item.id} className="glass-card" style={{
