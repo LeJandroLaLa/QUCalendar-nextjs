@@ -1,4 +1,4 @@
-import { initializeApp, getApps } from 'firebase/app'
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
@@ -13,7 +13,18 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 }
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
+function createFirebaseApp(): FirebaseApp {
+  if (!firebaseConfig.apiKey) {
+    throw new Error(
+      '[Firebase] NEXT_PUBLIC_FIREBASE_API_KEY is missing. ' +
+      'Check your .env.local file.'
+    )
+  }
+  return getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
+}
+
+const app: FirebaseApp = createFirebaseApp()
+
 export const db = getFirestore(app)
 export const auth = getAuth(app)
 export const storage = getStorage(app)

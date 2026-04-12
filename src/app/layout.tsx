@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { AuthProvider } from "@/context/AuthContext";
-import Header from "@/components/Header";
+import { ClientProviders } from "@/components/ClientProviders";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,12 +22,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <AuthProvider>
-          <Header />
-          <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem" }}>
-            {children}
-          </main>
-        </AuthProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );
