@@ -62,7 +62,7 @@ export default function EventDetail({ id }: { id: string }) {
     )
   }
 
-  const emoji = EVENT_CATEGORIES[event.category] || '📅'
+  const emoji = event.category ? (EVENT_CATEGORIES[event.category] || '📅') : '📅'
 
   return (
     <div style={{ fontFamily: "'Exo 2', sans-serif" }}>

@@ -93,10 +93,10 @@ export default function Header() {
         color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
         textDecoration: 'none',
         fontFamily: "'Exo 2', sans-serif",
-        fontSize: '0.95rem',
+        fontSize: '15px',
         fontWeight: 600,
         letterSpacing: '0.05em',
-        paddingBottom: '0.15rem',
+        padding: '4px 8px',
         position: 'relative',
         transition: 'color 0.2s',
       }}

@@ -75,22 +75,24 @@ function calculateStardate(dateStr: string, time?: string): string {
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: '0.5rem 0.75rem',
+  height: '44px',
+  padding: '10px 16px',
   borderRadius: '8px',
   border: '1px solid var(--border-glass)',
   background: 'rgba(255,255,255,0.05)',
   color: 'var(--text-primary)',
   fontFamily: "'Exo 2', sans-serif",
-  fontSize: '0.85rem',
+  fontSize: '14px',
   outline: 'none',
+  boxSizing: 'border-box',
 }
 
 const pillStyle: React.CSSProperties = {
-  padding: '0.35rem 0.75rem',
+  padding: '8px 16px',
   borderRadius: '20px',
   cursor: 'pointer',
   fontFamily: "'Exo 2', sans-serif",
-  fontSize: '0.8rem',
+  fontSize: '14px',
   border: '1px solid var(--border-glass)',
   background: 'rgba(255,255,255,0.05)',
   color: 'var(--text-primary)',
@@ -279,7 +281,7 @@ export default function HomePage() {
         </div>
 
         {/* Row 1 — Event Type dropdowns + Giving Back */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
           {(Object.entries(EVENT_TAGS) as [keyof typeof EVENT_TAGS, typeof EVENT_TAGS[keyof typeof EVENT_TAGS]][]).map(([key, group]) => {
             const isOpen = openDropdown === key
             const activeInGroup = group.tags.filter(t => activeTags.has(t.tag)).length
@@ -375,10 +377,10 @@ export default function HomePage() {
         </div>
 
         {/* Row 2 — Space Type */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '8px', borderTop: '1px solid var(--border-glass)', paddingTop: '8px' }}>
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.6rem',
+            fontSize: '12px',
             letterSpacing: '2px',
             opacity: 0.55,
             fontVariant: 'small-caps',
@@ -393,8 +395,8 @@ export default function HomePage() {
                 onClick={() => toggleTag(tag)}
                 style={{
                   ...pillStyle,
-                  fontSize: '0.75rem',
-                  padding: '0.25rem 0.65rem',
+                  fontSize: '14px',
+                  padding: '8px 16px',
                   background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
                 }}
@@ -406,10 +408,10 @@ export default function HomePage() {
         </div>
 
         {/* Row 3 — Age & Identity */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '8px' }}>
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.6rem',
+            fontSize: '12px',
             letterSpacing: '2px',
             opacity: 0.55,
             fontVariant: 'small-caps',
@@ -424,8 +426,8 @@ export default function HomePage() {
                 onClick={() => toggleTag(age)}
                 style={{
                   ...pillStyle,
-                  fontSize: '0.75rem',
-                  padding: '0.25rem 0.65rem',
+                  fontSize: '14px',
+                  padding: '8px 16px',
                   background: isActive ? 'rgba(255,59,59,0.25)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-red)' : '1px solid var(--border-glass)',
                 }}
@@ -440,7 +442,7 @@ export default function HomePage() {
 
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.6rem',
+            fontSize: '12px',
             letterSpacing: '2px',
             opacity: 0.55,
             fontVariant: 'small-caps',
@@ -455,8 +457,8 @@ export default function HomePage() {
                 onClick={() => toggleTag(tag)}
                 style={{
                   ...pillStyle,
-                  fontSize: '0.75rem',
-                  padding: '0.25rem 0.65rem',
+                  fontSize: '14px',
+                  padding: '8px 16px',
                   background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
                 }}
@@ -472,15 +474,15 @@ export default function HomePage() {
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '0.5rem',
+            gap: '8px',
             alignItems: 'center',
-            marginTop: '0.5rem',
+            marginTop: '8px',
             borderTop: '1px solid var(--border-glass)',
-            paddingTop: '0.75rem',
+            paddingTop: '8px',
           }}>
             <span style={{
               fontFamily: "'Orbitron', sans-serif",
-              fontSize: '0.6rem',
+              fontSize: '12px',
               letterSpacing: '2px',
               opacity: 0.55,
               fontVariant: 'small-caps',
@@ -492,11 +494,11 @@ export default function HomePage() {
                 key={tag}
                 onClick={() => removeTagWithSubtags(tag)}
                 style={{
-                  padding: '0.25rem 0.75rem',
+                  padding: '8px 16px',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   fontFamily: "'Exo 2', sans-serif",
-                  fontSize: '0.8rem',
+                  fontSize: '14px',
                   background: 'rgba(155,61,184,0.35)',
                   border: '1px solid var(--pride-violet)',
                   color: 'var(--text-primary)',
@@ -517,8 +519,8 @@ export default function HomePage() {
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
         {(['calendar', 'list'] as const).map(mode => (
           <button key={mode} onClick={() => setViewMode(mode)} style={{
-            padding: '0.4rem 1.25rem', borderRadius: '20px', cursor: 'pointer',
-            fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
+            padding: '12px 24px', borderRadius: '20px', cursor: 'pointer',
+            fontFamily: "'Exo 2', sans-serif", fontSize: '14px', minHeight: '44px',
             background: viewMode === mode ? 'rgba(117,7,135,0.5)' : 'rgba(255,255,255,0.05)',
             border: `1px solid ${viewMode === mode ? 'rgba(117,7,135,0.9)' : 'var(--border-glass)'}`,
             color: 'var(--text-primary)',
