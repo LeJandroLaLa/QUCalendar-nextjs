@@ -148,6 +148,7 @@ export interface QUEvent {
   vendors?: Vendor[]
   category?: string
   tags?: string[]
+  identityTags?: string[]
   imageUrl?: string
   ticketLink?: string
   rsvpRequired?: boolean
