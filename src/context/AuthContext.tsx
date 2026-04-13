@@ -11,10 +11,14 @@ import {
   signInWithEmailLink,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { auth } from '@/lib/firebase'
+import { db } from '@/lib/firebase'
+import { QUUser } from '@/lib/types'
 
 interface AuthContextType {
   user: User | null
+  quUser: QUUser | null
   loading: boolean
   signInWithGoogle: () => Promise<void>
   signInWithMagicLink: (email: string) => Promise<void>
@@ -25,11 +29,39 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [quUser, setQuUser] = useState<QUUser | null>(null)
   const [loading, setLoading] = useState(true)
 
+  async function syncUserDocument(firebaseUser: User): Promise<void> {
+    const userRef = doc(db, 'users', firebaseUser.uid)
+    const userSnap = await getDoc(userRef)
+
+    if (!userSnap.exists()) {
+      const newUser: QUUser = {
+        userId: firebaseUser.uid,
+        displayName: firebaseUser.displayName ?? 'Anonymous',
+        email: firebaseUser.email ?? '',
+        roles: ['user'],
+        isProfilePublic: false,
+        createdAt: serverTimestamp() as QUUser['createdAt'],
+        lastLoginAt: serverTimestamp() as QUUser['lastLoginAt'],
+      }
+      await setDoc(userRef, newUser)
+      setQuUser(newUser)
+    } else {
+      await setDoc(userRef, { lastLoginAt: serverTimestamp() }, { merge: true })
+      setQuUser(userSnap.data() as QUUser)
+    }
+  }
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser)
+      if (firebaseUser) {
+        await syncUserDocument(firebaseUser)
+      } else {
+        setQuUser(null)
+      }
       setLoading(false)
     })
     return unsubscribe
@@ -75,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithMagicLink, signOut }}>
+    <AuthContext.Provider value={{ user, quUser, loading, signInWithGoogle, signInWithMagicLink, signOut }}>
       {children}
     </AuthContext.Provider>
   )
