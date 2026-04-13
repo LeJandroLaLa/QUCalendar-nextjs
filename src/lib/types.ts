@@ -1,6 +1,25 @@
 import { Timestamp } from 'firebase/firestore'
 
 // ─────────────────────────────────────────
+// IDENTITY TAGS
+// ─────────────────────────────────────────
+export type IdentityTag =
+  | 'Trans'
+  | 'Indigenous'
+  | 'Global Majority'
+  | 'ND'
+  | 'Kink'
+  | 'Bears'
+  | 'Femme-Focused'
+  | 'Bi / Pan'
+  | 'Sober'
+
+export const IDENTITY_TAGS: IdentityTag[] = [
+  'Trans', 'Indigenous', 'Global Majority', 'ND',
+  'Kink', 'Bears', 'Femme-Focused', 'Bi / Pan', 'Sober',
+]
+
+// ─────────────────────────────────────────
 // USERS
 // ─────────────────────────────────────────
 export interface QUUser {
@@ -13,7 +32,7 @@ export interface QUUser {
   profileImageUrl?: string
   linkedArtistId?: string
   linkedSpaceIds?: string[]
-  communityAffiliations?: string[]
+  communityAffiliations?: IdentityTag[]
   isProfilePublic: boolean
   notes?: string
   city?: string
@@ -73,6 +92,7 @@ export interface Space {
   transitInfo?: string
   hours?: Record<string, string>
   socialLinks?: Record<string, string>
+  communityFocus?: IdentityTag[]
   ownerUid: string
   spaceManagerIds?: string[]
   braveSpace: boolean
@@ -146,8 +166,9 @@ export interface QUEvent {
   artistIds?: string[]
   unregisteredPerformers?: UnregisteredPerformer[]
   vendors?: Vendor[]
-  category?: string
-  tags?: string[]
+  category?: EventCategory
+  identityTags?: IdentityTag[]
+  noCellPhones?: boolean
   imageUrl?: string
   ticketLink?: string
   rsvpRequired?: boolean
@@ -197,6 +218,7 @@ export interface VaultEntry {
   contributorUid: string
   visibility: 'public' | 'private'
   tags?: string[]
+  identityTags?: IdentityTag[]
   neighborhoodTag?: string
   createdAt: Timestamp
   updatedAt: Timestamp
@@ -206,9 +228,9 @@ export interface VaultEntry {
 export const VAULT_ENTRIES_PATH = 'spaces/{spaceId}/vault_entries/{entryId}'
 
 // ─────────────────────────────────────────
-// EVENT CATEGORIES (kept for backward compatibility with admin pages)
+// EVENT CATEGORIES
 // ─────────────────────────────────────────
-export const EVENT_CATEGORIES: Record<string, string> = {
+export const EVENT_CATEGORIES = {
   'Drag Show': '🎭',
   'Live Music': '🎵',
   'Party': '🎉',
@@ -229,11 +251,10 @@ export const EVENT_CATEGORIES: Record<string, string> = {
   'Live DJ': '🥁',
   'Theater': '🎭',
   'Community Event': '🌈',
-  'Trans Community': '⚧️',
-  'Indigenous': '🪶',
-  'Global Majority': '🌍',
   'Giving Back': '🩷',
-}
+} as const
+
+export type EventCategory = keyof typeof EVENT_CATEGORIES
 
 // ─────────────────────────────────────────
 // EVENT TAGS
@@ -374,4 +395,11 @@ export const ROSTER_SECTION_LABELS: Record<RosterParticipantType, string> = {
   performer: 'Live Performances',
   merchant: 'Artist Market',
   presenter: 'Featured Presenters',
+}
+
+// ─────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────
+export function buildTagFilter(selected: IdentityTag[]): IdentityTag[] {
+  return selected.slice(0, 30)
 }

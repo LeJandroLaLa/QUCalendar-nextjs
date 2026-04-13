@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { EVENT_CATEGORIES } from '@/lib/types'
+import { EVENT_CATEGORIES, EventCategory } from '@/lib/types'
 
 interface PendingEvent {
   id: string
@@ -11,7 +11,7 @@ interface PendingEvent {
   date?: string
   time?: string
   venue?: string
-  category?: string
+  category?: EventCategory
   description?: string
   imageUrl?: string
   ticketLink?: string
@@ -72,7 +72,7 @@ export default function AdminEventsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {events.map((event) => {
-            const emoji = event.category ? (EVENT_CATEGORIES[event.category] || '📅') : '📅'
+            const emoji = event.category != null ? EVENT_CATEGORIES[event.category] : '📅'
 
             return (
               <div key={event.id} className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
