@@ -318,10 +318,10 @@ export default function HomePage() {
                     background: '#2a2a2a',
                     border: '1px solid var(--border-glass)',
                     borderRadius: '12px',
-                    padding: '0.75rem',
+                    padding: '1rem',
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '0.4rem',
+                    gap: '8px',
                     zIndex: 200,
                     boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
                     minWidth: '280px',
@@ -333,11 +333,11 @@ export default function HomePage() {
                           key={tag}
                           onClick={() => toggleTag(tag)}
                           style={{
-                            padding: '0.3rem 0.8rem',
+                            padding: '8px 16px',
                             borderRadius: '20px',
                             cursor: 'pointer',
                             fontFamily: "'Exo 2', sans-serif",
-                            fontSize: '0.75rem',
+                            fontSize: '14px',
                             background: isActive ? 'rgba(77,121,255,0.28)' : 'rgba(255,255,255,0.07)',
                             border: isActive ? '1px solid var(--pride-blue)' : '1px solid var(--border-glass)',
                             color: 'var(--text-primary)',
@@ -488,11 +488,11 @@ export default function HomePage() {
                 key={tag}
                 onClick={() => removeTagWithSubtags(tag)}
                 style={{
-                  padding: '0.25rem 0.75rem',
+                  padding: '8px 16px',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   fontFamily: "'Exo 2', sans-serif",
-                  fontSize: '0.8rem',
+                  fontSize: '14px',
                   background: 'rgba(155,61,184,0.35)',
                   border: '1px solid var(--pride-violet)',
                   color: 'var(--text-primary)',
@@ -607,7 +607,7 @@ export default function HomePage() {
                                 const isActive = activeTags.has(tag)
                                 return (
                                   <span key={tag} style={{
-                                    fontSize: '0.65rem', padding: '0.1rem 0.5rem', borderRadius: '10px',
+                                    fontSize: '12px', padding: '4px 10px', borderRadius: '10px',
                                     background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
                                     border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
                                     color: 'var(--text-secondary)',
@@ -671,7 +671,7 @@ export default function HomePage() {
                             const isActive = activeTags.has(tag)
                             return (
                               <span key={tag} style={{
-                                fontSize: '0.62rem', padding: '0.1rem 0.4rem', borderRadius: '8px',
+                                fontSize: '12px', padding: '4px 10px', borderRadius: '8px',
                                 background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
                                 border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
                                 color: 'var(--text-secondary)',
