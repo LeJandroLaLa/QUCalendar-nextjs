@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { QUEvent, EVENT_TAGS, SPACE_TYPE_FILTERS, AGE_FILTERS, IDENTITY_FILTERS } from '@/lib/types'
+import { QUEvent, EVENT_TAGS, SPACE_TYPE_FILTERS, AGE_FILTERS, IDENTITY_FILTERS, buildTagFilter, IdentityTag } from '@/lib/types'
 import Link from 'next/link'
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
@@ -113,24 +113,28 @@ export default function HomePage() {
 
   const filterBarRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const fetchAll = async () => {
-      setLoading(true)
-      try {
-        const eventsSnap = await getDocs(
-          query(collection(db, 'events'), where('status', '==', 'approved'))
-        )
-        const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
-        const today = formatDateMDY(new Date())
-        setEvents(fetched.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)))
-      } catch (err) {
-        console.error('Error fetching data:', err)
-      } finally {
-        setLoading(false)
-      }
+  const fetchAll = useCallback(async () => {
+    setLoading(true)
+    try {
+      const baseQuery = [where('status', '==', 'approved')]
+      const tagArray = buildTagFilter(Array.from(activeTags) as IdentityTag[])
+      const firestoreQuery = tagArray.length > 0
+        ? query(collection(db, 'events'), ...baseQuery, where('identityTags', 'array-contains-any', tagArray))
+        : query(collection(db, 'events'), ...baseQuery)
+      const eventsSnap = await getDocs(firestoreQuery)
+      const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
+      const today = formatDateMDY(new Date())
+      setEvents(fetched.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)))
+    } catch (err) {
+      console.error('Error fetching data:', err)
+    } finally {
+      setLoading(false)
     }
+  }, [activeTags])
+
+  useEffect(() => {
     fetchAll()
-  }, [])
+  }, [fetchAll])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
