@@ -324,7 +324,7 @@ export default function HomePage() {
                     gap: '0.4rem',
                     zIndex: 200,
                     boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-                    minWidth: '280px',
+                    minWidth: '320px',
                   }}>
                     {group.tags.map(({ tag, emoji }) => {
                       const isActive = activeTags.has(tag)
@@ -333,16 +333,17 @@ export default function HomePage() {
                           key={tag}
                           onClick={() => toggleTag(tag)}
                           style={{
-                            padding: '0.3rem 0.8rem',
+                            padding: '8px 16px',
+                            minHeight: '44px',
                             borderRadius: '20px',
                             cursor: 'pointer',
                             fontFamily: "'Exo 2', sans-serif",
-                            fontSize: '0.75rem',
+                            fontSize: '14px',
                             background: isActive ? 'rgba(77,121,255,0.28)' : 'rgba(255,255,255,0.07)',
                             border: isActive ? '1px solid var(--pride-blue)' : '1px solid var(--border-glass)',
                             color: 'var(--text-primary)',
                             transition: 'all 0.15s',
-                            whiteSpace: 'nowrap',
+                            whiteSpace: 'nowrap' as const,
                           }}
                         >
                           {emoji} {tag}
