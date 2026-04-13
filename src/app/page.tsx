@@ -75,22 +75,24 @@ function calculateStardate(dateStr: string, time?: string): string {
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: '0.5rem 0.75rem',
+  padding: '10px 16px',
+  height: '44px',
   borderRadius: '8px',
   border: '1px solid var(--border-glass)',
   background: 'rgba(255,255,255,0.05)',
   color: 'var(--text-primary)',
   fontFamily: "'Exo 2', sans-serif",
-  fontSize: '0.85rem',
+  fontSize: '14px',
   outline: 'none',
+  boxSizing: 'border-box',
 }
 
 const pillStyle: React.CSSProperties = {
-  padding: '0.35rem 0.75rem',
+  padding: '8px 16px',
   borderRadius: '20px',
   cursor: 'pointer',
   fontFamily: "'Exo 2', sans-serif",
-  fontSize: '0.8rem',
+  fontSize: '14px',
   border: '1px solid var(--border-glass)',
   background: 'rgba(255,255,255,0.05)',
   color: 'var(--text-primary)',
@@ -230,7 +232,7 @@ export default function HomePage() {
     <div>
       {/* Hero */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}>
+        <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.6rem', marginBottom: '0.5rem' }}>
           <span style={{
             background: 'linear-gradient(90deg, #FF3B3B, #9B3DB8)',
             WebkitBackgroundClip: 'text',
@@ -238,7 +240,7 @@ export default function HomePage() {
             backgroundClip: 'text',
           }}>QU</span> — Your Queer Community, Synchronized
         </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.5 }}>
           Discover the events, spaces, and artists that make your Queer community alive — starting in Cincinnati, built for everywhere.
         </p>
       </div>
@@ -378,7 +380,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.6rem',
+            fontSize: '12px',
             letterSpacing: '2px',
             opacity: 0.55,
             fontVariant: 'small-caps',
@@ -393,8 +395,6 @@ export default function HomePage() {
                 onClick={() => toggleTag(tag)}
                 style={{
                   ...pillStyle,
-                  fontSize: '0.75rem',
-                  padding: '0.25rem 0.65rem',
                   background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
                 }}
@@ -409,7 +409,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.6rem',
+            fontSize: '12px',
             letterSpacing: '2px',
             opacity: 0.55,
             fontVariant: 'small-caps',
@@ -424,8 +424,6 @@ export default function HomePage() {
                 onClick={() => toggleTag(age)}
                 style={{
                   ...pillStyle,
-                  fontSize: '0.75rem',
-                  padding: '0.25rem 0.65rem',
                   background: isActive ? 'rgba(255,59,59,0.25)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-red)' : '1px solid var(--border-glass)',
                 }}
@@ -440,7 +438,7 @@ export default function HomePage() {
 
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '0.6rem',
+            fontSize: '12px',
             letterSpacing: '2px',
             opacity: 0.55,
             fontVariant: 'small-caps',
@@ -455,8 +453,6 @@ export default function HomePage() {
                 onClick={() => toggleTag(tag)}
                 style={{
                   ...pillStyle,
-                  fontSize: '0.75rem',
-                  padding: '0.25rem 0.65rem',
                   background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
                 }}
@@ -517,8 +513,8 @@ export default function HomePage() {
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
         {(['calendar', 'list'] as const).map(mode => (
           <button key={mode} onClick={() => setViewMode(mode)} style={{
-            padding: '0.4rem 1.25rem', borderRadius: '20px', cursor: 'pointer',
-            fontFamily: "'Exo 2', sans-serif", fontSize: '0.85rem',
+            padding: '12px 24px', borderRadius: '20px', cursor: 'pointer',
+            fontFamily: "'Exo 2', sans-serif", fontSize: '14px',
             background: viewMode === mode ? 'rgba(117,7,135,0.5)' : 'rgba(255,255,255,0.05)',
             border: `1px solid ${viewMode === mode ? 'rgba(117,7,135,0.9)' : 'var(--border-glass)'}`,
             color: 'var(--text-primary)',
