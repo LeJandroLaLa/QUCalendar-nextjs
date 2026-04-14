@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
 import VibeToggle from './VibeToggle'
 
 function getStardate(): string {
@@ -17,8 +16,8 @@ function getStardate(): string {
 
 export default function Header() {
   const pathname = usePathname()
-  const { user } = useAuth()
   const [stardate, setStardate] = useState('')
+  const [partnerHovered, setPartnerHovered] = useState(false)
 
   useEffect(() => {
     setStardate(getStardate())
@@ -30,7 +29,6 @@ export default function Header() {
     { label: 'Calendar', href: '/' },
     { label: 'Spaces', href: '/spaces' },
     { label: 'Artists', href: '/artists' },
-    ...(user ? [{ label: 'My Profiles', href: '/my-profiles' }] : []),
     { label: 'About', href: '/about' },
   ]
 
@@ -73,6 +71,26 @@ export default function Header() {
             {stardate}
           </span>
           <VibeToggle />
+          <Link
+            href="/partner"
+            style={{
+              padding: '0.3rem 1rem',
+              borderRadius: 20,
+              border: `1px solid ${partnerHovered ? 'var(--pride-violet)' : 'var(--border-glass)'}`,
+              background: 'rgba(255,255,255,0.06)',
+              color: partnerHovered ? 'var(--text-primary)' : 'var(--text-secondary)',
+              fontFamily: "'Exo 2', sans-serif",
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              textDecoration: 'none',
+              transition: 'border-color 0.2s, color 0.2s',
+            }}
+            onMouseEnter={() => setPartnerHovered(true)}
+            onMouseLeave={() => setPartnerHovered(false)}
+          >
+            Partner
+          </Link>
         </div>
       </div>
 
