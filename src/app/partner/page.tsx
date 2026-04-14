@@ -3,18 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signInWithPopup, GoogleAuthProvider, sendSignInLinkToEmail } from 'firebase/auth'
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 export default function PartnerLoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [error, setError] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
-  const [loadingMagic, setLoadingMagic] = useState(false)
   const [googleHovered, setGoogleHovered] = useState(false)
-  const [magicHovered, setMagicHovered] = useState(false)
 
   const handleGoogleSignIn = async () => {
     setError('')
@@ -28,32 +24,6 @@ export default function PartnerLoginPage() {
     } finally {
       setLoadingGoogle(false)
     }
-  }
-
-  const handleMagicLink = async () => {
-    if (!email.trim()) {
-      setError('Please enter your email address.')
-      return
-    }
-    setError('')
-    setLoadingMagic(true)
-    try {
-      const actionCodeSettings = {
-        url: `${window.location.origin}/dashboard`,
-        handleCodeInApp: true,
-      }
-      await sendSignInLinkToEmail(auth, email.trim(), actionCodeSettings)
-      window.localStorage.setItem('emailForSignIn', email.trim())
-      setMagicLinkSent(true)
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to send magic link. Please try again.')
-    } finally {
-      setLoadingMagic(false)
-    }
-  }
-
-  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleMagicLink()
   }
 
   return (
@@ -148,7 +118,7 @@ export default function PartnerLoginPage() {
             width: '100%',
             padding: '14px 20px',
             borderRadius: 12,
-            border: `1px solid ${googleHovered ? 'var(--border-glass)' : 'var(--border-glass)'}`,
+            border: '1px solid var(--border-glass)',
             background: googleHovered ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)',
             color: 'var(--text-primary)',
             fontFamily: "'Exo 2', sans-serif",
@@ -172,82 +142,6 @@ export default function PartnerLoginPage() {
           </svg>
           {loadingGoogle ? 'Signing in…' : 'Continue with Google'}
         </button>
-
-        {/* Divider */}
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem',
-        }}>
-          <div style={{ flex: 1, height: 1, background: 'var(--border-glass)' }} />
-          <span style={{
-            fontFamily: "'Exo 2', sans-serif",
-            fontSize: '0.8rem',
-            color: 'var(--text-secondary)',
-            opacity: 0.7,
-          }}>or</span>
-          <div style={{ flex: 1, height: 1, background: 'var(--border-glass)' }} />
-        </div>
-
-        {/* Magic link section */}
-        {magicLinkSent ? (
-          <p style={{
-            fontFamily: "'Exo 2', sans-serif",
-            color: 'var(--pride-green)',
-            fontSize: '0.95rem',
-            textAlign: 'center',
-            margin: 0,
-            lineHeight: 1.6,
-          }}>
-            Check your email — your link is on the way.
-          </p>
-        ) : (
-          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <input
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={e => { setEmail(e.target.value); if (error) setError('') }}
-              onKeyDown={handleEmailKeyDown}
-              style={{
-                width: '100%',
-                padding: '14px 20px',
-                borderRadius: 12,
-                border: '1px solid var(--border-glass)',
-                background: 'rgba(255,255,255,0.05)',
-                color: 'var(--text-primary)',
-                fontFamily: "'Exo 2', sans-serif",
-                fontSize: '1rem',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-            <button
-              onClick={handleMagicLink}
-              disabled={loadingMagic}
-              onMouseEnter={() => setMagicHovered(true)}
-              onMouseLeave={() => setMagicHovered(false)}
-              style={{
-                width: '100%',
-                padding: '14px 20px',
-                borderRadius: 12,
-                border: `1px solid ${magicHovered ? 'var(--pride-violet)' : 'var(--border-glass)'}`,
-                background: magicHovered ? 'rgba(155,61,184,0.2)' : 'rgba(255,255,255,0.05)',
-                color: 'var(--text-primary)',
-                fontFamily: "'Exo 2', sans-serif",
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: loadingMagic ? 'not-allowed' : 'pointer',
-                opacity: loadingMagic ? 0.7 : 1,
-                transition: 'background 0.2s, border-color 0.2s',
-                boxSizing: 'border-box',
-              }}
-            >
-              {loadingMagic ? 'Sending…' : 'Send Magic Link'}
-            </button>
-          </div>
-        )}
 
         {/* Back link */}
         <Link
