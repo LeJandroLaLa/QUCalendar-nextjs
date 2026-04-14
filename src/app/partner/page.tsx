@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { signInWithPopup, GoogleAuthProvider, sendSignInLinkToEmail } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 export default function PartnerLoginPage() {
@@ -11,6 +11,28 @@ export default function PartnerLoginPage() {
   const [error, setError] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [googleHovered, setGoogleHovered] = useState(false)
+  const [email, setEmail] = useState('')
+  const [loadingEmail, setLoadingEmail] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  const [emailError, setEmailError] = useState('')
+
+  const handleEmailSignIn = async () => {
+    setEmailError('')
+    setLoadingEmail(true)
+    try {
+      const actionCodeSettings = {
+        url: `${window.location.origin}/auth/callback`,
+        handleCodeInApp: true,
+      }
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings)
+      window.localStorage.setItem('emailForSignIn', email)
+      setEmailSent(true)
+    } catch (err: unknown) {
+      setEmailError(err instanceof Error ? err.message : 'Failed to send sign-in link. Please try again.')
+    } finally {
+      setLoadingEmail(false)
+    }
+  }
 
   const handleGoogleSignIn = async () => {
     setError('')
@@ -142,6 +164,116 @@ export default function PartnerLoginPage() {
           </svg>
           {loadingGoogle ? 'Signing in…' : 'Continue with Google'}
         </button>
+
+        {/* Apple sign-in — coming soon */}
+        <button
+          disabled
+          style={{
+            width: '100%',
+            padding: '14px 20px',
+            borderRadius: 12,
+            border: '1px solid var(--border-glass)',
+            background: 'rgba(255,255,255,0.05)',
+            color: 'var(--text-primary)',
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '1rem',
+            fontWeight: 600,
+            cursor: 'not-allowed',
+            opacity: 0.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.6rem',
+            boxSizing: 'border-box',
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.54 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"/>
+          </svg>
+          Continue with Apple — Coming Soon
+        </button>
+
+        {/* or divider */}
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+        }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-glass)' }} />
+          <span style={{
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '0.85rem',
+            color: 'var(--text-secondary)',
+            opacity: 0.7,
+          }}>or</span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-glass)' }} />
+        </div>
+
+        {/* Email link sign-in */}
+        {emailSent ? (
+          <p style={{
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '0.95rem',
+            color: 'var(--text-primary)',
+            textAlign: 'center',
+            margin: 0,
+          }}>
+            Check your email for your sign-in link.
+          </p>
+        ) : (
+          <>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                borderRadius: 12,
+                border: '1px solid var(--border-glass)',
+                background: 'rgba(255,255,255,0.05)',
+                color: 'var(--text-primary)',
+                fontFamily: "'Exo 2', sans-serif",
+                fontSize: '1rem',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+            <button
+              onClick={handleEmailSignIn}
+              disabled={loadingEmail || !email}
+              style={{
+                width: '100%',
+                padding: '14px 20px',
+                borderRadius: 12,
+                border: '1px solid var(--border-glass)',
+                background: 'rgba(255,255,255,0.05)',
+                color: 'var(--text-primary)',
+                fontFamily: "'Exo 2', sans-serif",
+                fontSize: '1rem',
+                fontWeight: 600,
+                cursor: loadingEmail || !email ? 'not-allowed' : 'pointer',
+                opacity: loadingEmail || !email ? 0.6 : 1,
+                boxSizing: 'border-box',
+              }}
+            >
+              {loadingEmail ? 'Sending…' : 'Send Sign-In Link'}
+            </button>
+            {emailError && (
+              <p style={{
+                color: 'var(--pride-red)',
+                fontFamily: "'Exo 2', sans-serif",
+                fontSize: '0.85rem',
+                textAlign: 'center',
+                margin: 0,
+              }}>
+                {emailError}
+              </p>
+            )}
+          </>
+        )}
 
         {/* Back link */}
         <Link
