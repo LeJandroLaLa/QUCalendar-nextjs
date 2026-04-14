@@ -5,7 +5,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { QUEvent, EVENT_TAGS, SPACE_TYPE_FILTERS, AGE_FILTERS, IDENTITY_FILTERS, buildTagFilter, IdentityTag } from '@/lib/types'
 import Link from 'next/link'
-import ZipGate from '@/components/ZipGate'
+import ZipGate, { LocationData } from '@/components/ZipGate'
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
   'July','August','September','October','November','December']
@@ -103,8 +103,8 @@ const pillStyle: React.CSSProperties = {
 
 
 export default function HomePage() {
-  const [zip, setZip] = useState<string>('')
-  const [zipEntered, setZipEntered] = useState<boolean>(false)
+  const [location, setLocation] = useState<LocationData | null>(null)
+  const [locationEntered, setLocationEntered] = useState<boolean>(false)
   const [events, setEvents] = useState<QUEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar')
@@ -236,8 +236,8 @@ export default function HomePage() {
       ? (() => { const d = parseDateLocal(dateFilter); return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}` })()
       : ''
 
-  if (!zipEntered) {
-    return <ZipGate onZipSubmit={(z) => { setZip(z); setZipEntered(true); setLocationQuery(z) }} />
+  if (!locationEntered) {
+    return <ZipGate onLocationSubmit={(loc) => { setLocation(loc); setLocationEntered(true); setLocationQuery(loc.displayName) }} />
   }
 
   return (
