@@ -7,6 +7,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/context/AuthContext'
 import { QUEvent, Space, Artist } from '@/lib/types'
+import RegionSelector from '@/components/RegionSelector'
 
 const cardStyle: React.CSSProperties = {
   background: 'var(--bg-card)',
@@ -184,7 +185,9 @@ export default function DashboardPage() {
   const isSpaceManager = quUser.roles.includes('space-manager')
   const isArtist = quUser.roles.includes('artist')
   const isAdmin = quUser.roles.includes('admin')
+  const isModerator = !!(quUser.moderatorRegions && quUser.moderatorRegions.length > 0)
   const canInvite = isArtist || isAdmin
+  const showRegionSelector = isArtist || isModerator
 
   return (
     <div style={{
@@ -219,6 +222,59 @@ export default function DashboardPage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
+          {/* Profile Section */}
+          {showRegionSelector && (
+            <div style={cardStyle}>
+              <h2 style={sectionHeadingStyle}>Profile</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div>
+                  <p style={{
+                    fontFamily: "'Exo 2', sans-serif",
+                    fontSize: '0.8rem',
+                    color: 'var(--text-secondary)',
+                    margin: '0 0 0.4rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}>
+                    Display Name
+                  </p>
+                  <p style={{
+                    fontFamily: "'Exo 2', sans-serif",
+                    color: 'var(--text-primary)',
+                    fontSize: '0.95rem',
+                    margin: 0,
+                  }}>
+                    {quUser.displayName}
+                  </p>
+                </div>
+                <div>
+                  <p style={{
+                    fontFamily: "'Exo 2', sans-serif",
+                    fontSize: '0.8rem',
+                    color: 'var(--text-secondary)',
+                    margin: '0 0 0.4rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}>
+                    Region
+                  </p>
+                  <RegionSelector />
+                  <p style={{
+                    fontFamily: "'Exo 2', sans-serif",
+                    fontSize: '0.75rem',
+                    color: 'var(--text-secondary)',
+                    margin: '0.5rem 0 0',
+                    opacity: 0.7,
+                  }}>
+                    Your region determines your local community and moderation scope
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Section 1 — My Events (all authenticated users) */}
           <div style={cardStyle}>

@@ -8,7 +8,7 @@ import {
   GoogleAuthProvider,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { auth } from '@/lib/firebase'
 import { db } from '@/lib/firebase'
 import { QUUser } from '@/lib/types'
@@ -19,6 +19,7 @@ interface AuthContextType {
   loading: boolean
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
+  updateUserRegion: (regionId: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -74,8 +75,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await firebaseSignOut(auth)
   }
 
+  const updateUserRegion = async (regionId: string): Promise<void> => {
+    if (!user) throw new Error('No authenticated user')
+    const userRef = doc(db, 'users', user.uid)
+    await updateDoc(userRef, { regionId })
+    setQuUser(prev => prev ? { ...prev, regionId } : prev)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, quUser, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, quUser, loading, signInWithGoogle, signOut, updateUserRegion }}>
       {children}
     </AuthContext.Provider>
   )
