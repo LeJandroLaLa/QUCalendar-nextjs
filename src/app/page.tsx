@@ -75,8 +75,8 @@ function calculateStardate(dateStr: string, time?: string): string {
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: '10px 16px',
   height: '44px',
+  padding: '10px 16px',
   borderRadius: '8px',
   border: '1px solid var(--border-glass)',
   background: 'rgba(255,255,255,0.05)',
@@ -232,7 +232,7 @@ export default function HomePage() {
     <div>
       {/* Hero */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.6rem', marginBottom: '0.5rem' }}>
+        <h2 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem', marginBottom: '0.5rem' }}>
           <span style={{
             background: 'linear-gradient(90deg, #FF3B3B, #9B3DB8)',
             WebkitBackgroundClip: 'text',
@@ -240,7 +240,7 @@ export default function HomePage() {
             backgroundClip: 'text',
           }}>QU</span> — Your Queer Community, Synchronized
         </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: 1.5 }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
           Discover the events, spaces, and artists that make your Queer community alive — starting in Cincinnati, built for everywhere.
         </p>
       </div>
@@ -281,7 +281,7 @@ export default function HomePage() {
         </div>
 
         {/* Row 1 — Event Type dropdowns + Giving Back */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
           {(Object.entries(EVENT_TAGS) as [keyof typeof EVENT_TAGS, typeof EVENT_TAGS[keyof typeof EVENT_TAGS]][]).map(([key, group]) => {
             const isOpen = openDropdown === key
             const activeInGroup = group.tags.filter(t => activeTags.has(t.tag)).length
@@ -318,10 +318,10 @@ export default function HomePage() {
                     background: '#2a2a2a',
                     border: '1px solid var(--border-glass)',
                     borderRadius: '12px',
-                    padding: '1rem',
+                    padding: '0.75rem',
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '8px',
+                    gap: '0.4rem',
                     zIndex: 200,
                     boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
                     minWidth: '280px',
@@ -333,11 +333,11 @@ export default function HomePage() {
                           key={tag}
                           onClick={() => toggleTag(tag)}
                           style={{
-                            padding: '8px 16px',
+                            padding: '0.3rem 0.8rem',
                             borderRadius: '20px',
                             cursor: 'pointer',
                             fontFamily: "'Exo 2', sans-serif",
-                            fontSize: '14px',
+                            fontSize: '0.75rem',
                             background: isActive ? 'rgba(77,121,255,0.28)' : 'rgba(255,255,255,0.07)',
                             border: isActive ? '1px solid var(--pride-blue)' : '1px solid var(--border-glass)',
                             color: 'var(--text-primary)',
@@ -377,7 +377,7 @@ export default function HomePage() {
         </div>
 
         {/* Row 2 — Space Type */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '8px', borderTop: '1px solid var(--border-glass)', paddingTop: '8px' }}>
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '12px',
@@ -395,6 +395,8 @@ export default function HomePage() {
                 onClick={() => toggleTag(tag)}
                 style={{
                   ...pillStyle,
+                  fontSize: '14px',
+                  padding: '8px 16px',
                   background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
                 }}
@@ -406,7 +408,7 @@ export default function HomePage() {
         </div>
 
         {/* Row 3 — Age & Identity */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '0.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '8px' }}>
           <span style={{
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '12px',
@@ -424,6 +426,8 @@ export default function HomePage() {
                 onClick={() => toggleTag(age)}
                 style={{
                   ...pillStyle,
+                  fontSize: '14px',
+                  padding: '8px 16px',
                   background: isActive ? 'rgba(255,59,59,0.25)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-red)' : '1px solid var(--border-glass)',
                 }}
@@ -453,6 +457,8 @@ export default function HomePage() {
                 onClick={() => toggleTag(tag)}
                 style={{
                   ...pillStyle,
+                  fontSize: '14px',
+                  padding: '8px 16px',
                   background: isActive ? 'rgba(0,168,50,0.2)' : 'rgba(255,255,255,0.05)',
                   border: isActive ? '1px solid var(--pride-green)' : '1px solid var(--border-glass)',
                 }}
@@ -468,15 +474,15 @@ export default function HomePage() {
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '0.5rem',
+            gap: '8px',
             alignItems: 'center',
-            marginTop: '0.5rem',
+            marginTop: '8px',
             borderTop: '1px solid var(--border-glass)',
-            paddingTop: '0.75rem',
+            paddingTop: '8px',
           }}>
             <span style={{
               fontFamily: "'Orbitron', sans-serif",
-              fontSize: '0.6rem',
+              fontSize: '12px',
               letterSpacing: '2px',
               opacity: 0.55,
               fontVariant: 'small-caps',
@@ -514,7 +520,7 @@ export default function HomePage() {
         {(['calendar', 'list'] as const).map(mode => (
           <button key={mode} onClick={() => setViewMode(mode)} style={{
             padding: '12px 24px', borderRadius: '20px', cursor: 'pointer',
-            fontFamily: "'Exo 2', sans-serif", fontSize: '14px',
+            fontFamily: "'Exo 2', sans-serif", fontSize: '14px', minHeight: '44px',
             background: viewMode === mode ? 'rgba(117,7,135,0.5)' : 'rgba(255,255,255,0.05)',
             border: `1px solid ${viewMode === mode ? 'rgba(117,7,135,0.9)' : 'var(--border-glass)'}`,
             color: 'var(--text-primary)',
@@ -607,7 +613,7 @@ export default function HomePage() {
                                 const isActive = activeTags.has(tag)
                                 return (
                                   <span key={tag} style={{
-                                    fontSize: '12px', padding: '4px 10px', borderRadius: '10px',
+                                    fontSize: '0.65rem', padding: '0.1rem 0.5rem', borderRadius: '10px',
                                     background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
                                     border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
                                     color: 'var(--text-secondary)',
@@ -671,7 +677,7 @@ export default function HomePage() {
                             const isActive = activeTags.has(tag)
                             return (
                               <span key={tag} style={{
-                                fontSize: '12px', padding: '4px 10px', borderRadius: '8px',
+                                fontSize: '0.62rem', padding: '0.1rem 0.4rem', borderRadius: '8px',
                                 background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
                                 border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
                                 color: 'var(--text-secondary)',

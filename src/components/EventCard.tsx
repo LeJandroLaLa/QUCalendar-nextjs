@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { QUEvent, EVENT_CATEGORIES } from '@/lib/types'
 
 export default function EventCard({ event }: { event: QUEvent }) {
-  const emoji = event.category != null ? EVENT_CATEGORIES[event.category] : '📅'
+  const emoji = event.category ? (EVENT_CATEGORIES[event.category] || '📅') : '📅'
 
   return (
     <Link href={`/events/${event.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
