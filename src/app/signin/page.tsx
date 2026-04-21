@@ -5,14 +5,11 @@ import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 
 export default function SignInPage() {
-  const { user, signInWithGoogle, signInWithMagicLink } = useAuth()
+  const { user, signInWithGoogle } = useAuth()
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Redirect if already signed in
   if (user) {
     router.push('/')
     return null
@@ -26,21 +23,6 @@ export default function SignInPage() {
       router.push('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in with Google')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) return
-    setError('')
-    setLoading(true)
-    try {
-      await signInWithMagicLink(email)
-      setMagicLinkSent(true)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send magic link')
     } finally {
       setLoading(false)
     }
@@ -120,58 +102,6 @@ export default function SignInPage() {
           </button>
           <p style={disclaimerStyle}>
             By signing in with Google, you agree to share your email and profile information with QU Calendar.
-          </p>
-        </div>
-
-        {/* Email Magic Link */}
-        <div style={cardStyle}>
-          <h3 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '1rem', color: 'var(--text-primary)' }}>
-            Email Magic Link
-          </h3>
-          {magicLinkSent ? (
-            <div style={{
-              textAlign: 'center',
-              padding: '1rem',
-              color: 'var(--pride-green)',
-              fontSize: '0.95rem',
-            }}>
-              Check your email for a sign in link
-            </div>
-          ) : (
-            <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-glass)',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  color: 'var(--text-primary)',
-                  fontFamily: "'Exo 2', sans-serif",
-                  fontSize: '1rem',
-                  outline: 'none',
-                }}
-              />
-              <button
-                type="submit"
-                disabled={loading || !email}
-                style={{
-                  ...buttonStyle,
-                  background: 'var(--pride-violet)',
-                  color: '#fff',
-                  opacity: loading || !email ? 0.6 : 1,
-                }}
-              >
-                {loading ? 'Sending...' : 'Send Magic Link'}
-              </button>
-            </form>
-          )}
-          <p style={disclaimerStyle}>
-            We&apos;ll send a one-time sign in link to your email. No password needed.
           </p>
         </div>
 

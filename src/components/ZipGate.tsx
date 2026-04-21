@@ -132,6 +132,7 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
         alignItems: 'center',
         gap: '1.25rem',
       }}>
+
         {/* Wordmark */}
         <h1
           className="pride-gradient-text"
@@ -155,7 +156,7 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
           borderRadius: 2,
         }} />
 
-        {/* Heading */}
+        {/* Main heading */}
         <h2 style={{
           fontFamily: "'Orbitron', sans-serif",
           fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
@@ -163,19 +164,32 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
           textAlign: 'center',
           margin: 0,
         }}>
-          Find Your Pulse.
+          Find Your Space!
         </h2>
+
+        {/* Where Are U */}
+        <p style={{
+          fontFamily: "'Orbitron', sans-serif",
+          fontSize: '1rem',
+          color: 'var(--text-primary)',
+          textAlign: 'center',
+          letterSpacing: '1px',
+          margin: 0,
+        }}>
+          Where Are U?
+        </p>
 
         {/* Subtext */}
         <p style={{
           fontFamily: "'Exo 2', sans-serif",
-          color: 'var(--text-secondary)',
+          fontSize: '1rem',
+          color: 'var(--text-primary)',
           lineHeight: 1.6,
           textAlign: 'center',
           margin: 0,
-          fontSize: '0.95rem',
         }}>
-          Enter your city to find queer events, spaces, and artists near you. No accounts. No tracking. No data kept. Just your community, right now.
+          Enter your city or postal code to find events, spaces, and artists near{' '}
+          <span style={{ fontWeight: 700, color: 'var(--accent)' }}>U</span>.
         </p>
 
         {/* Search input + dropdown */}
@@ -184,7 +198,7 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
             <input
               type="text"
               inputMode="text"
-              placeholder="Your city or postal code"
+              placeholder="city or postal code"
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -275,7 +289,7 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
           )}
         </div>
 
-        {/* Manual submit button — shown when user types without selecting from dropdown */}
+        {/* Manual submit button */}
         {showButton && (
           <button
             onClick={handleManualSubmit}
@@ -297,17 +311,29 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
           </button>
         )}
 
-        {/* Small print */}
+        {/* Privacy First */}
         <p style={{
-          fontFamily: "'Exo 2', sans-serif",
-          fontSize: '0.75rem',
-          color: 'var(--text-secondary)',
-          opacity: 0.6,
-          textAlign: 'center',
+          fontFamily: "'Orbitron', sans-serif",
+          fontSize: '0.6rem',
+          letterSpacing: '2px',
+          color: 'var(--accent)',
+          textTransform: 'uppercase',
           margin: 0,
         }}>
-          QU Calendar is 100% cookieless. Your location is never stored or tracked.
+          Privacy First
         </p>
+        <p style={{
+          fontFamily: "'Exo 2', sans-serif",
+          fontSize: '0.8rem',
+          color: 'var(--text-secondary)',
+          lineHeight: 1.5,
+          textAlign: 'center',
+          margin: 0,
+          marginTop: '-0.75rem',
+        }}>
+          No accounts | No tracking | No stored data.
+        </p>
+
       </div>
     </div>
   )

@@ -6,9 +6,6 @@ import {
   onAuthStateChanged,
   signInWithPopup,
   GoogleAuthProvider,
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
@@ -21,7 +18,6 @@ interface AuthContextType {
   quUser: QUUser | null
   loading: boolean
   signInWithGoogle: () => Promise<void>
-  signInWithMagicLink: (email: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -67,25 +63,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe
   }, [])
 
-  // Handle magic link completion on page load
-  useEffect(() => {
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      let email = localStorage.getItem('emailForSignIn')
-      if (!email) {
-        email = window.prompt('Please provide your email for confirmation')
-      }
-      if (email) {
-        signInWithEmailLink(auth, email, window.location.href)
-          .then(() => {
-            localStorage.removeItem('emailForSignIn')
-          })
-          .catch((error) => {
-            console.error('Error completing magic link sign in:', error)
-          })
-      }
-    }
-  }, [])
-
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider()
     provider.addScope('email')
@@ -93,21 +70,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithPopup(auth, provider)
   }
 
-  const signInWithMagicLink = async (email: string) => {
-    const actionCodeSettings = {
-      url: `${window.location.origin}/auth/callback`,
-      handleCodeInApp: true,
-    }
-    await sendSignInLinkToEmail(auth, email, actionCodeSettings)
-    localStorage.setItem('emailForSignIn', email)
-  }
-
   const signOut = async () => {
     await firebaseSignOut(auth)
   }
 
   return (
-    <AuthContext.Provider value={{ user, quUser, loading, signInWithGoogle, signInWithMagicLink, signOut }}>
+    <AuthContext.Provider value={{ user, quUser, loading, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   )
