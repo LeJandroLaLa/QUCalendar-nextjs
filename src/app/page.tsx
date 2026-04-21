@@ -3,9 +3,8 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { QUEvent, EVENT_TAGS, SPACE_TYPE_FILTERS, AGE_FILTERS, IDENTITY_FILTERS, buildTagFilter, IdentityTag } from '@/lib/types'
+import { QUEvent, EVENT_TAGS, SPACE_TYPE_FILTERS, AGE_FILTERS, IDENTITY_FILTERS } from '@/lib/types'
 import Link from 'next/link'
-import ZipGate, { LocationData } from '@/components/ZipGate'
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
   'July','August','September','October','November','December']
@@ -103,8 +102,6 @@ const pillStyle: React.CSSProperties = {
 
 
 export default function HomePage() {
-  const [location, setLocation] = useState<LocationData | null>(null)
-  const [locationEntered, setLocationEntered] = useState<boolean>(false)
   const [events, setEvents] = useState<QUEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar')
@@ -116,28 +113,24 @@ export default function HomePage() {
 
   const filterBarRef = useRef<HTMLDivElement>(null)
 
-  const fetchAll = useCallback(async () => {
-    setLoading(true)
-    try {
-      const baseQuery = [where('status', '==', 'approved')]
-      const tagArray = buildTagFilter(Array.from(activeTags) as IdentityTag[])
-      const firestoreQuery = tagArray.length > 0
-        ? query(collection(db, 'events'), ...baseQuery, where('identityTags', 'array-contains-any', tagArray))
-        : query(collection(db, 'events'), ...baseQuery)
-      const eventsSnap = await getDocs(firestoreQuery)
-      const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
-      const today = formatDateMDY(new Date())
-      setEvents(fetched.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)))
-    } catch (err) {
-      console.error('Error fetching data:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [activeTags])
-
   useEffect(() => {
+    const fetchAll = async () => {
+      setLoading(true)
+      try {
+        const eventsSnap = await getDocs(
+          query(collection(db, 'events'), where('status', '==', 'approved'))
+        )
+        const fetched: QUEvent[] = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as QUEvent[]
+        const today = formatDateMDY(new Date())
+        setEvents(fetched.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)))
+      } catch (err) {
+        console.error('Error fetching data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
     fetchAll()
-  }, [fetchAll])
+  }, [])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -217,9 +210,8 @@ export default function HomePage() {
 
     if (activeTags.size > 0) {
       evts = evts.filter(e => {
-        const eventIdentitySet = new Set<string>(e.identityTags ?? [])
         for (const tag of activeTags) {
-          if (!eventIdentitySet.has(tag)) return false
+          if (!e.tags?.includes(tag)) return false
         }
         return true
       })
@@ -235,10 +227,6 @@ export default function HomePage() {
     : dateFilter
       ? (() => { const d = parseDateLocal(dateFilter); return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}` })()
       : ''
-
-  if (!locationEntered) {
-    return <ZipGate onLocationSubmit={(loc) => { setLocation(loc); setLocationEntered(true); setLocationQuery(loc.displayName) }} />
-  }
 
   return (
     <div>
@@ -330,13 +318,13 @@ export default function HomePage() {
                     background: '#2a2a2a',
                     border: '1px solid var(--border-glass)',
                     borderRadius: '12px',
-                    padding: '0.75rem',
+                    padding: '1rem',
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '0.4rem',
+                    gap: '8px',
                     zIndex: 200,
                     boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-                    minWidth: '320px',
+                    minWidth: '280px',
                   }}>
                     {group.tags.map(({ tag, emoji }) => {
                       const isActive = activeTags.has(tag)
@@ -346,7 +334,6 @@ export default function HomePage() {
                           onClick={() => toggleTag(tag)}
                           style={{
                             padding: '8px 16px',
-                            minHeight: '44px',
                             borderRadius: '20px',
                             cursor: 'pointer',
                             fontFamily: "'Exo 2', sans-serif",
@@ -355,7 +342,7 @@ export default function HomePage() {
                             border: isActive ? '1px solid var(--pride-blue)' : '1px solid var(--border-glass)',
                             color: 'var(--text-primary)',
                             transition: 'all 0.15s',
-                            whiteSpace: 'nowrap' as const,
+                            whiteSpace: 'nowrap',
                           }}
                         >
                           {emoji} {tag}
@@ -501,11 +488,11 @@ export default function HomePage() {
                 key={tag}
                 onClick={() => removeTagWithSubtags(tag)}
                 style={{
-                  padding: '0.25rem 0.75rem',
+                  padding: '8px 16px',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   fontFamily: "'Exo 2', sans-serif",
-                  fontSize: '0.8rem',
+                  fontSize: '14px',
                   background: 'rgba(155,61,184,0.35)',
                   border: '1px solid var(--pride-violet)',
                   color: 'var(--text-primary)',
@@ -614,13 +601,13 @@ export default function HomePage() {
                               📍 {event.venue}
                             </div>
                           )}
-                          {event.identityTags && event.identityTags.length > 0 && (
+                          {event.tags && event.tags.length > 0 && (
                             <div style={{ marginTop: '0.35rem', display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                              {event.identityTags.map(tag => {
+                              {event.tags.map(tag => {
                                 const isActive = activeTags.has(tag)
                                 return (
                                   <span key={tag} style={{
-                                    fontSize: '0.65rem', padding: '0.1rem 0.5rem', borderRadius: '10px',
+                                    fontSize: '12px', padding: '4px 10px', borderRadius: '10px',
                                     background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
                                     border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
                                     color: 'var(--text-secondary)',
@@ -678,13 +665,13 @@ export default function HomePage() {
                       {event.venue && (
                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>📍 {event.venue}</div>
                       )}
-                      {event.identityTags && event.identityTags.length > 0 && (
+                      {event.tags && event.tags.length > 0 && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.25rem' }}>
-                          {event.identityTags.map(tag => {
+                          {event.tags.map(tag => {
                             const isActive = activeTags.has(tag)
                             return (
                               <span key={tag} style={{
-                                fontSize: '0.62rem', padding: '0.1rem 0.4rem', borderRadius: '8px',
+                                fontSize: '12px', padding: '4px 10px', borderRadius: '8px',
                                 background: isActive ? 'rgba(155,61,184,0.2)' : 'rgba(117,7,135,0.3)',
                                 border: `1px solid ${isActive ? 'rgba(155,61,184,0.5)' : 'transparent'}`,
                                 color: 'var(--text-secondary)',
