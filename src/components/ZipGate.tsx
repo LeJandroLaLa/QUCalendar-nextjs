@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 
 export interface LocationData {
   city: string
@@ -105,6 +106,7 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
 
   const showButton = query.trim().length >= 3
   const buttonLabel = nominatimFailed ? 'Continue' : "Let's Go"
+  const [partnerHovered, setPartnerHovered] = useState(false)
 
   return (
     <div style={{
@@ -120,6 +122,24 @@ export default function ZipGate({ onLocationSubmit }: ZipGateProps) {
       alignItems: 'center',
       justifyContent: 'center',
     }}>
+      <Link
+        href="/partner"
+        onMouseEnter={() => setPartnerHovered(true)}
+        onMouseLeave={() => setPartnerHovered(false)}
+        style={{
+          position: 'absolute',
+          top: '1.5rem',
+          right: '2rem',
+          fontFamily: "'Exo 2', sans-serif",
+          fontSize: '0.8rem',
+          color: 'var(--text-secondary)',
+          textDecoration: 'none',
+          opacity: partnerHovered ? 1 : 0.55,
+          transition: 'opacity 0.2s',
+        }}
+      >
+        Partner Login
+      </Link>
       <div style={{
         background: 'var(--bg-card)',
         border: '1px solid var(--border-glass)',
