@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { doc, setDoc, Timestamp } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
-import { validateInvite, markInviteUsed, type Invite } from '@/lib/invites'
-import type { QUUser } from '@/lib/types'
+import { validateInvite, markInviteUsed } from '@/lib/invites'
+import type { QUUser, QUInvite } from '@/lib/types'
 
 function Field({
   label,
@@ -60,7 +60,7 @@ function RegisterInner() {
   const router = useRouter()
   const token = searchParams.get('token') ?? ''
 
-  const [invite, setInvite] = useState<Invite | null>(null)
+  const [invite, setInvite] = useState<QUInvite | null>(null)
   const [tokenStatus, setTokenStatus] = useState<'loading' | 'valid' | 'invalid'>('loading')
 
   const [displayName, setDisplayName] = useState('')
@@ -111,17 +111,32 @@ function RegisterInner() {
       const { user } = await createUserWithEmailAndPassword(auth, invite!.email, password)
       await updateProfile(user, { displayName: displayName.trim() })
 
+      const roleToRoles: Record<QUInvite['role'], QUUser['roles']> = {
+        artist: ['artist'],
+        venue: ['space-manager'],
+        moderator: ['admin'],
+        superadmin: ['superadmin'],
+      }
+
       const userDoc: QUUser = {
         userId: user.uid,
         displayName: displayName.trim(),
         email: invite!.email,
-        roles: ['user'],
+        roles: roleToRoles[invite!.role],
+        regionId: invite!.regionId,
         isProfilePublic: false,
         createdAt: Timestamp.now(),
       }
-      const firestoreData = phone.trim()
-        ? { ...userDoc, phone: phone.trim() }
-        : userDoc
+
+      const trustFields = invite!.role === 'artist'
+        ? { trustScore: 0, vouchesReceived: 0, vouchesGiven: 0, moderatorEligible: false }
+        : {}
+
+      const firestoreData = {
+        ...userDoc,
+        ...trustFields,
+        ...(phone.trim() ? { phone: phone.trim() } : {}),
+      }
 
       await setDoc(doc(db, 'users', user.uid), firestoreData)
       await markInviteUsed(token, user.uid)

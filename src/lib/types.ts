@@ -422,6 +422,8 @@ export interface QURegion {
 export interface QUInvite {
   token: string
   email: string
+  role: 'artist' | 'venue' | 'moderator' | 'superadmin'
+  regionId: string
   createdAt: Timestamp
   createdBy: string
   used: boolean

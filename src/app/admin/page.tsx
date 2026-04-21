@@ -6,7 +6,8 @@ import { db } from '@/lib/firebase'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { generateInvite } from '@/lib/invites'
-import type { QUInvite } from '@/lib/types'
+import { getAllRegions } from '@/lib/regions'
+import type { QUInvite, QURegion } from '@/lib/types'
 
 interface RecentItem {
   id: string
@@ -23,13 +24,17 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState<'artist' | 'venue' | 'moderator'>('artist')
+  const [inviteRegionId, setInviteRegionId] = useState('')
   const [inviteUrl, setInviteUrl] = useState('')
   const [inviteLoading, setInviteLoading] = useState(false)
   const [inviteError, setInviteError] = useState('')
   const [copied, setCopied] = useState(false)
   const [invites, setInvites] = useState<QUInvite[]>([])
+  const [regions, setRegions] = useState<QURegion[]>([])
 
   const isAdmin = quUser?.roles.includes('admin') ?? false
+  const isSuperAdmin = quUser?.roles.includes('superadmin') ?? false
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,6 +97,14 @@ export default function AdminDashboard() {
     return unsub
   }, [isAdmin])
 
+  useEffect(() => {
+    if (!isAdmin) return
+    getAllRegions().then((r) => {
+      setRegions(r)
+      if (r.length > 0) setInviteRegionId(r[0].id)
+    })
+  }, [isAdmin])
+
   const handleSendInvite = async () => {
     setInviteError('')
     setInviteUrl('')
@@ -99,10 +112,14 @@ export default function AdminDashboard() {
       setInviteError('Please enter an email address.')
       return
     }
+    if (!inviteRegionId) {
+      setInviteError('Please select a region.')
+      return
+    }
     if (!user) return
     setInviteLoading(true)
     try {
-      const url = await generateInvite(inviteEmail.trim(), user.uid)
+      const url = await generateInvite(inviteEmail.trim(), user.uid, inviteRole, inviteRegionId)
       setInviteUrl(url)
       setInviteEmail('')
     } catch {
@@ -272,6 +289,49 @@ export default function AdminDashboard() {
                 boxSizing: 'border-box',
               }}
             />
+            <select
+              value={inviteRole}
+              onChange={(e) => setInviteRole(e.target.value as 'artist' | 'venue' | 'moderator')}
+              style={{
+                padding: '10px 12px',
+                height: '44px',
+                borderRadius: '8px',
+                border: '1px solid var(--border-glass)',
+                background: 'rgba(255,255,255,0.05)',
+                color: 'var(--text-primary)',
+                fontFamily: "'Exo 2', sans-serif",
+                fontSize: '0.9rem',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="artist">Artist</option>
+              <option value="venue">Venue</option>
+              {isSuperAdmin && <option value="moderator">Moderator</option>}
+            </select>
+            <select
+              value={inviteRegionId}
+              onChange={(e) => setInviteRegionId(e.target.value)}
+              style={{
+                padding: '10px 12px',
+                height: '44px',
+                borderRadius: '8px',
+                border: '1px solid var(--border-glass)',
+                background: 'rgba(255,255,255,0.05)',
+                color: 'var(--text-primary)',
+                fontFamily: "'Exo 2', sans-serif",
+                fontSize: '0.9rem',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              {regions.length === 0 && (
+                <option value="">No regions</option>
+              )}
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
+            </select>
             <button
               onClick={handleSendInvite}
               disabled={inviteLoading}
@@ -385,16 +445,27 @@ export default function AdminDashboard() {
                   padding: '0.55rem 0',
                   borderBottom: '1px solid var(--border-glass)',
                 }}>
-                  <span style={{
-                    fontFamily: "'Exo 2', sans-serif",
-                    fontSize: '0.85rem',
-                    color: 'var(--text-primary)',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {inv.email}
-                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <span style={{
+                      fontFamily: "'Exo 2', sans-serif",
+                      fontSize: '0.85rem',
+                      color: 'var(--text-primary)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      display: 'block',
+                    }}>
+                      {inv.email}
+                    </span>
+                    <span style={{
+                      fontFamily: "'Exo 2', sans-serif",
+                      fontSize: '0.72rem',
+                      color: 'var(--text-secondary)',
+                      opacity: 0.75,
+                    }}>
+                      {inv.role} · {regions.find(r => r.id === inv.regionId)?.name ?? inv.regionId}
+                    </span>
+                  </div>
                   <span style={{
                     fontFamily: "'Exo 2', sans-serif",
                     fontSize: '0.75rem',

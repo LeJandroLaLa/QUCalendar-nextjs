@@ -14,13 +14,20 @@ import type { QUInvite } from '@/lib/types'
 
 const INVITES_COLLECTION = 'invites'
 
-export async function generateInvite(email: string, adminUID: string): Promise<string> {
+export async function generateInvite(
+  email: string,
+  adminUID: string,
+  role: 'artist' | 'venue' | 'moderator' | 'superadmin',
+  regionId: string
+): Promise<string> {
   const token = crypto.randomUUID()
   const ref = doc(collection(db, INVITES_COLLECTION), token)
 
   await setDoc(ref, {
     token,
     email,
+    role,
+    regionId,
     createdAt: serverTimestamp(),
     createdBy: adminUID,
     used: false,
