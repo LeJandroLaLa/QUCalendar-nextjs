@@ -26,7 +26,7 @@ export interface QUUser {
   userId: string
   displayName: string
   email: string
-  roles: ('admin' | 'organizer' | 'artist' | 'space-manager' | 'user')[]
+  roles: ('superadmin' | 'admin' | 'organizer' | 'artist' | 'space-manager' | 'user')[]
   bio?: string
   preferredPronouns?: string
   profileImageUrl?: string
@@ -36,6 +36,12 @@ export interface QUUser {
   isProfilePublic: boolean
   notes?: string
   city?: string
+  regionId?: string
+  moderatorRegions?: string[]
+  trustScore?: number
+  vouchesReceived?: number
+  vouchesGiven?: number
+  moderatorEligible?: boolean
   createdAt: Timestamp
   lastLoginAt?: Timestamp
   deletedAt?: Timestamp | null
