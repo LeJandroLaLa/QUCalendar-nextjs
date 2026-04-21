@@ -398,6 +398,19 @@ export const ROSTER_SECTION_LABELS: Record<RosterParticipantType, string> = {
 }
 
 // ─────────────────────────────────────────
+// INVITES
+// ─────────────────────────────────────────
+export interface QUInvite {
+  token: string
+  email: string
+  createdAt: Timestamp
+  createdBy: string
+  used: boolean
+  usedAt: Timestamp | null
+  usedBy: string | null
+}
+
+// ─────────────────────────────────────────
 // UTILITIES
 // ─────────────────────────────────────────
 export function buildTagFilter(selected: IdentityTag[]): IdentityTag[] {
