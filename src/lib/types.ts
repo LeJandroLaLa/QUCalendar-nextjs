@@ -398,6 +398,19 @@ export const ROSTER_SECTION_LABELS: Record<RosterParticipantType, string> = {
 }
 
 // ─────────────────────────────────────────
+// REGIONS
+// ─────────────────────────────────────────
+export interface QURegion {
+  id: string
+  name: string
+  state: string
+  country: string
+  timezone: string
+  status: 'active' | 'pending'
+  createdAt: Timestamp
+}
+
+// ─────────────────────────────────────────
 // INVITES
 // ─────────────────────────────────────────
 export interface QUInvite {
