@@ -3,14 +3,43 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import {
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  GoogleAuthProvider,
+} from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+
+function getEmailErrorMessage(code: string): string {
+  switch (code) {
+    case 'auth/user-not-found':
+      return 'No account found with this email.'
+    case 'auth/wrong-password':
+      return 'Incorrect password. Please try again.'
+    case 'auth/invalid-credential':
+      return 'Incorrect email or password.'
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.'
+    case 'auth/too-many-requests':
+      return 'Too many failed attempts. Please try again later.'
+    default:
+      return 'Sign-in failed. Please try again.'
+  }
+}
 
 export default function PartnerLoginPage() {
   const router = useRouter()
   const [error, setError] = useState('')
   const [loadingGoogle, setLoadingGoogle] = useState(false)
   const [googleHovered, setGoogleHovered] = useState(false)
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [resetMessage, setResetMessage] = useState('')
+  const [loadingEmail, setLoadingEmail] = useState(false)
+  const [signInHovered, setSignInHovered] = useState(false)
 
   const handleGoogleSignIn = async () => {
     setError('')
@@ -23,6 +52,47 @@ export default function PartnerLoginPage() {
       setError(err instanceof Error ? err.message : 'Google sign-in failed. Please try again.')
     } finally {
       setLoadingGoogle(false)
+    }
+  }
+
+  const handleEmailSignIn = async () => {
+    setEmailError('')
+    setResetMessage('')
+    if (!email || !password) {
+      setEmailError('Please enter your email and password.')
+      return
+    }
+    setLoadingEmail(true)
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+      router.push('/dashboard')
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code ?? ''
+      setEmailError(getEmailErrorMessage(code))
+    } finally {
+      setLoadingEmail(false)
+    }
+  }
+
+  const handleForgotPassword = async () => {
+    setEmailError('')
+    setResetMessage('')
+    if (!email) {
+      setEmailError('Enter your email above to reset your password.')
+      return
+    }
+    try {
+      await sendPasswordResetEmail(auth, email)
+      setResetMessage('Password reset email sent. Check your inbox.')
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code ?? ''
+      if (code === 'auth/user-not-found') {
+        setEmailError('No account found with this email.')
+      } else if (code === 'auth/invalid-email') {
+        setEmailError('Please enter a valid email address.')
+      } else {
+        setEmailError('Could not send reset email. Please try again.')
+      }
     }
   }
 
@@ -169,6 +239,141 @@ export default function PartnerLoginPage() {
             <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.54 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"/>
           </svg>
           Continue with Apple — Coming Soon
+        </button>
+
+        {/* Divider */}
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+        }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-glass)' }} />
+          <span style={{
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '0.8rem',
+            color: 'var(--text-secondary)',
+            opacity: 0.6,
+          }}>
+            or
+          </span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-glass)' }} />
+        </div>
+
+        {/* Email input */}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e: { target: { value: string } }) => setEmail(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '14px 16px',
+            borderRadius: 12,
+            border: '1px solid var(--border-glass)',
+            background: 'rgba(255,255,255,0.05)',
+            color: 'var(--text-primary)',
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '1rem',
+            outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
+
+        {/* Password input */}
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e: { target: { value: string } }) => setPassword(e.target.value)}
+          onKeyDown={(e: { key: string }) => e.key === 'Enter' && handleEmailSignIn()}
+          style={{
+            width: '100%',
+            padding: '14px 16px',
+            borderRadius: 12,
+            border: '1px solid var(--border-glass)',
+            background: 'rgba(255,255,255,0.05)',
+            color: 'var(--text-primary)',
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '1rem',
+            outline: 'none',
+            boxSizing: 'border-box',
+          }}
+        />
+
+        {/* Forgot password */}
+        <div style={{ width: '100%', textAlign: 'right', marginTop: '-0.5rem' }}>
+          <button
+            onClick={handleForgotPassword}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              color: 'var(--text-secondary)',
+              fontFamily: "'Exo 2', sans-serif",
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              opacity: 0.75,
+              textDecoration: 'underline',
+            }}
+          >
+            Forgot password?
+          </button>
+        </div>
+
+        {/* Email error */}
+        {emailError && (
+          <p style={{
+            color: 'var(--pride-red)',
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '0.85rem',
+            textAlign: 'center',
+            margin: 0,
+            width: '100%',
+          }}>
+            {emailError}
+          </p>
+        )}
+
+        {/* Reset confirmation */}
+        {resetMessage && (
+          <p style={{
+            color: 'var(--text-secondary)',
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '0.85rem',
+            textAlign: 'center',
+            margin: 0,
+            width: '100%',
+          }}>
+            {resetMessage}
+          </p>
+        )}
+
+        {/* Sign In button */}
+        <button
+          onClick={handleEmailSignIn}
+          disabled={loadingEmail}
+          onMouseEnter={() => setSignInHovered(true)}
+          onMouseLeave={() => setSignInHovered(false)}
+          style={{
+            width: '100%',
+            padding: '14px 20px',
+            borderRadius: 12,
+            border: '1px solid var(--border-glass)',
+            background: signInHovered && !loadingEmail
+              ? 'rgba(255,255,255,0.15)'
+              : 'rgba(255,255,255,0.08)',
+            color: 'var(--text-primary)',
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: '1rem',
+            fontWeight: 600,
+            cursor: loadingEmail ? 'not-allowed' : 'pointer',
+            opacity: loadingEmail ? 0.7 : 1,
+            transition: 'background 0.2s',
+            boxSizing: 'border-box',
+          }}
+        >
+          {loadingEmail ? 'Signing in…' : 'Sign In'}
         </button>
 
         {/* Back link */}
