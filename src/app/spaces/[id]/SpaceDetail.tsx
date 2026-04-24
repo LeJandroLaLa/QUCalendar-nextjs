@@ -12,6 +12,7 @@ export default function SpaceDetail({ id }: { id: string }) {
   const [events, setEvents] = useState<QUEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [braveSpaceBadgeHovered, setBraveSpaceBadgeHovered] = useState(false)
 
   useEffect(() => {
     const fetchSpace = async () => {
@@ -107,7 +108,7 @@ export default function SpaceDetail({ id }: { id: string }) {
         </div>
 
         {/* Brave Space SVG badge */}
-        {space.braveSpace && (
+        {space.braveSpace?.status === 'certified' && (
           <div style={{ position: 'absolute', top: '1rem', left: '1rem' }}>
             <svg width="64" height="64" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -204,6 +205,51 @@ export default function SpaceDetail({ id }: { id: string }) {
             }}>
               {space.type}
             </span>
+          )}
+          {space.braveSpace?.status === 'certified' && (
+            <div style={{ position: 'relative', display: 'inline-flex' }}>
+              <span
+                onMouseEnter={() => setBraveSpaceBadgeHovered(true)}
+                onMouseLeave={() => setBraveSpaceBadgeHovered(false)}
+                style={{
+                  padding: '0.3rem 0.8rem',
+                  borderRadius: '999px',
+                  background: 'var(--gradient-pride)',
+                  fontSize: '0.75rem',
+                  color: '#fff',
+                  fontFamily: "'Orbitron', sans-serif",
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  cursor: 'default',
+                  userSelect: 'none',
+                }}
+              >
+                Brave Space
+              </span>
+              {braveSpaceBadgeHovered && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 'calc(100% + 8px)',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'rgba(18, 18, 18, 0.96)',
+                  border: '1px solid var(--border-glass)',
+                  borderRadius: '10px',
+                  padding: '0.75rem 1rem',
+                  width: '280px',
+                  fontSize: '0.8rem',
+                  color: 'var(--text-secondary)',
+                  fontFamily: "'Exo 2', sans-serif",
+                  lineHeight: 1.6,
+                  zIndex: 50,
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                  pointerEvents: 'none',
+                }}>
+                  This Space has committed to QUCalendar&apos;s standards for community safety, accessibility transparency, and zero-tolerance policies against bigotry.
+                </div>
+              )}
+            </div>
           )}
           {space.website && (
             <a

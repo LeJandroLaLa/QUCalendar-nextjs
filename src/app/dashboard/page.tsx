@@ -366,7 +366,7 @@ export default function DashboardPage() {
                           fontSize: '0.95rem',
                         }}>
                           {sp.name}
-                          {sp.braveSpace && (
+                          {sp.braveSpace?.status === 'certified' && (
                             <span style={{
                               marginLeft: '0.5rem',
                               padding: '0.15rem 0.5rem',
