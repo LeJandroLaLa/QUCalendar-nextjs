@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { Space, QUEvent } from '@/lib/types'
@@ -13,6 +13,18 @@ export default function SpaceDetail({ id }: { id: string }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [braveSpaceBadgeHovered, setBraveSpaceBadgeHovered] = useState(false)
+  const braveSpaceBadgeRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!braveSpaceBadgeHovered) return
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (braveSpaceBadgeRef.current && !braveSpaceBadgeRef.current.contains(e.target as Node)) {
+        setBraveSpaceBadgeHovered(false)
+      }
+    }
+    document.addEventListener('click', handleOutsideClick)
+    return () => document.removeEventListener('click', handleOutsideClick)
+  }, [braveSpaceBadgeHovered])
 
   useEffect(() => {
     const fetchSpace = async () => {
@@ -207,14 +219,15 @@ export default function SpaceDetail({ id }: { id: string }) {
             </span>
           )}
           {space.braveSpace?.status === 'certified' && (
-            <div style={{ position: 'relative', display: 'inline-flex' }}>
+            <div ref={braveSpaceBadgeRef} style={{ position: 'relative', display: 'inline-flex' }}>
               <span
                 onMouseEnter={() => setBraveSpaceBadgeHovered(true)}
                 onMouseLeave={() => setBraveSpaceBadgeHovered(false)}
+                onClick={() => setBraveSpaceBadgeHovered(prev => !prev)}
                 style={{
                   padding: '0.3rem 0.8rem',
                   borderRadius: '999px',
-                  background: 'var(--gradient-pride)',
+                  background: 'linear-gradient(135deg, #ff4d6d, #ff85a1, #c77dff, #4cc9f0, #80ffb4)',
                   fontSize: '0.75rem',
                   color: '#fff',
                   fontFamily: "'Orbitron', sans-serif",
