@@ -24,7 +24,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   const [inviteEmail, setInviteEmail] = useState('')
-  const [inviteRole, setInviteRole] = useState<'artist' | 'space' | 'moderator'>('artist')
+  const [inviteRole, setInviteRole] = useState<'artist' | 'venue' | 'moderator'>('artist')
   const [inviteRegionId, setInviteRegionId] = useState('')
   const [inviteUrl, setInviteUrl] = useState('')
   const [inviteLoading, setInviteLoading] = useState(false)
