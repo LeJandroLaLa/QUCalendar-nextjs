@@ -113,7 +113,7 @@ function RegisterInner() {
 
       const roleToRoles: Record<QUInvite['role'], QUUser['roles']> = {
         artist: ['artist'],
-        venue: ['space-manager'],
+        space: ['space'],
         moderator: ['admin'],
         superadmin: ['superadmin'],
       }

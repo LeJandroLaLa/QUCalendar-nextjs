@@ -26,7 +26,7 @@ export interface QUUser {
   userId: string
   displayName: string
   email: string
-  roles: ('superadmin' | 'admin' | 'organizer' | 'artist' | 'space-manager' | 'user')[]
+  roles: ('superadmin' | 'admin' | 'organizer' | 'artist' | 'space' | 'user')[]
   bio?: string
   preferredPronouns?: string
   profileImageUrl?: string
@@ -45,6 +45,32 @@ export interface QUUser {
   createdAt: Timestamp
   lastLoginAt?: Timestamp
   deletedAt?: Timestamp | null
+}
+
+// ─────────────────────────────────────────
+// BRAVE SPACE CERTIFICATION
+// ─────────────────────────────────────────
+export interface BraveSpaceCertification {
+  status: 'not_applied' | 'pending' | 'certified' | 'suspended' | 'revoked'
+  certifiedAt: Timestamp | null
+  submittedAt: Timestamp | null
+  reviewedBy: string | null
+  accountabilityPolicyUrl: string | null
+  accountabilityPolicyText: string | null
+  accessibility: {
+    wheelchairAccessible: boolean
+    rampDetails: string | null
+    elevatorStatus: 'available' | 'unavailable' | 'not_applicable'
+    strobeWarning: boolean
+    volumeEnvironment: 'quiet' | 'moderate' | 'loud'
+    parkingDetails: string | null
+    additionalNotes: string | null
+  }
+  genderNeutralRestrooms: boolean
+  genderNeutralRestroomsNotes: string | null
+  deEscalationPolicyText: string | null
+  deEscalationPolicyUrl: string | null
+  prioritizesDeEscalationOverPolice: boolean
 }
 
 // ─────────────────────────────────────────
@@ -101,7 +127,7 @@ export interface Space {
   communityFocus?: IdentityTag[]
   ownerUid: string
   spaceManagerIds?: string[]
-  braveSpace: boolean
+  braveSpace?: BraveSpaceCertification
   status?: 'unverified' | 'pending' | 'approved' | 'rejected'
   inMemoriam?: boolean
   closedDate?: string
@@ -422,7 +448,7 @@ export interface QURegion {
 export interface QUInvite {
   token: string
   email: string
-  role: 'artist' | 'venue' | 'moderator' | 'superadmin'
+  role: 'artist' | 'space' | 'moderator' | 'superadmin'
   regionId: string
   createdAt: Timestamp
   createdBy: string

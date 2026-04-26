@@ -291,7 +291,7 @@ export default function AdminDashboard() {
             />
             <select
               value={inviteRole}
-              onChange={(e) => setInviteRole(e.target.value as 'artist' | 'venue' | 'moderator')}
+              onChange={(e) => setInviteRole(e.target.value as 'artist' | 'space' | 'moderator')}
               style={{
                 padding: '10px 12px',
                 height: '44px',
@@ -306,7 +306,7 @@ export default function AdminDashboard() {
               }}
             >
               <option value="artist">Artist</option>
-              <option value="venue">Venue</option>
+              <option value="space">Space</option>
               {isSuperAdmin && <option value="moderator">Moderator</option>}
             </select>
             <select

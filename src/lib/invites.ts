@@ -17,7 +17,7 @@ const INVITES_COLLECTION = 'invites'
 export async function generateInvite(
   email: string,
   adminUID: string,
-  role: 'artist' | 'venue' | 'moderator' | 'superadmin',
+  role: 'artist' | 'space' | 'moderator' | 'superadmin',
   regionId: string
 ): Promise<string> {
   const token = crypto.randomUUID()
